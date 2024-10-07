@@ -9,9 +9,12 @@ import SwiftUI
 
 @main
 struct foqosApp: App {
+    @StateObject private var appBlocker = AppBlocker()
+    
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .environmentObject(appBlocker)
         }
     }
 }

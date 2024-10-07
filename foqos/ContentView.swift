@@ -1,21 +1,23 @@
-//
-//  ContentView.swift
-//  foqos
-//
-//  Created by Ali Waseem on 2024-10-06.
-//
-
 import SwiftUI
 
 struct ContentView: View {
     var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
+        TabView {
+            HomeView()
+                .tabItem {
+                    Label("Home", systemImage: "house")
+                }
+            
+            AppListView()
+                .tabItem {
+                    Label("Apps", systemImage: "app.badge")
+                }
+            
+            SettingsView()
+                .tabItem {
+                    Label("Settings", systemImage: "gear")
+                }
         }
-        .padding()
     }
 }
 
