@@ -33,7 +33,7 @@ struct HomeView: View {
                 .padding(.top)
         }
         .sheet(isPresented: $isScanning) {
-            NFCScannerView(nfcTag: $lastScannedTag)
+            NFCScannerView()
         }
         .onChange(of: lastScannedTag) { _, _ in
             appBlocker.toggleBlocking()

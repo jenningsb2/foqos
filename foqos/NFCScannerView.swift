@@ -1,7 +1,6 @@
 import SwiftUI
 
 struct NFCScannerView: View {
-    @Binding var nfcTag: String?
     @StateObject private var nfcScanner = NFCScanner()
     
     var body: some View {
@@ -13,6 +12,20 @@ struct NFCScannerView: View {
             if let scannedTag = nfcScanner.scannedNFCTag {
                 Text("Scanned NFC Tag: \(scannedTag)")
             }
+            
+            if let error = nfcScanner.errorMessage {
+                Text("Error: \(error)")
+                    .foregroundColor(.red)
+            }
+            
+            ScrollView {
+                Text(nfcScanner.debugLog)
+                    .font(.system(size: 12))
+                    .padding()
+            }
+        }
+        .onAppear {
+            nfcScanner.log("NFCScannerView appeared")
         }
     }
 }
