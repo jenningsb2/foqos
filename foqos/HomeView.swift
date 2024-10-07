@@ -2,7 +2,8 @@ import SwiftUI
 
 struct HomeView: View {
     @StateObject private var appBlocker = AppBlocker()
-    @State private var isScanning = false
+    @StateObject private var nfcScanner = NFCScanner()
+    
     @State private var lastScannedTag: String?
     
     var body: some View {
@@ -16,7 +17,7 @@ struct HomeView: View {
             }
             
             Button("Scan NFC") {
-                isScanning = true
+                nfcScanner.scan()
             }
             .padding()
             .background(Color.blue)
@@ -31,9 +32,6 @@ struct HomeView: View {
             Text("Blocked Apps are set in the Apps tab")
                 .font(.subheadline)
                 .padding(.top)
-        }
-        .sheet(isPresented: $isScanning) {
-            NFCScannerView()
         }
         .onChange(of: lastScannedTag) { _, _ in
             appBlocker.toggleBlocking()
