@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import SwiftData
 
 @main
 struct foqosApp: App {
@@ -16,5 +17,6 @@ struct foqosApp: App {
             ContentView()
                 .environmentObject(appBlocker)
         }
+        .modelContainer(for: BlockedActivity.self)
     }
 }

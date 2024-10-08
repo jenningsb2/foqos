@@ -1,8 +1,8 @@
 import SwiftUI
 
 struct HomeView: View {
-    @StateObject private var appBlocker = AppBlocker()
     @StateObject private var nfcScanner = NFCScanner()
+    @EnvironmentObject var appBlocker: AppBlocker
     
     @State private var lastScannedTag: String?
     
