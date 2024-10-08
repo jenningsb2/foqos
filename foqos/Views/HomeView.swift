@@ -1,10 +1,10 @@
 import SwiftUI
 
 struct HomeView: View {
-    @StateObject private var nfcScanner = NFCScanner()
     @EnvironmentObject var appBlocker: AppBlocker
     
     @State private var lastScannedTag: String?
+    @StateObject private var nfcScanner = NFCScanner()
     
     var body: some View {
         VStack {
@@ -35,6 +35,9 @@ struct HomeView: View {
         }
         .onChange(of: lastScannedTag) { _, _ in
             appBlocker.toggleBlocking()
+        }
+        .onChange(of: nfcScanner.scannedNFCTag) { oldValue, newValue in
+            print("NFC Tag has been scanned with the following value \(newValue)")
         }
         .onAppear {
             appBlocker.requestAuthorization()

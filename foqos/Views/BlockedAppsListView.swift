@@ -6,9 +6,7 @@ struct BlockedAppsListView: View {
     
     @State private var blockActivitySelection: BlockedActivitySelection?
     @State private var activitySelection = FamilyActivitySelection()
-    
-    @EnvironmentObject var appBlocker: AppBlocker
-    
+        
     var body: some View {
         NavigationView {
             FamilyActivityPicker(selection: $activitySelection)
@@ -24,16 +22,11 @@ struct BlockedAppsListView: View {
         blockActivitySelection = BlockedActivitySelection.shared(in: context)
         if let val = blockActivitySelection?.selectedActivity {
             activitySelection = val
-            appBlocker.updateSelection(val)
         }
     }
     
     private func updateBlockedActivitySelection(newValue: FamilyActivitySelection) {
         BlockedActivitySelection.updateShared(in: context, with: newValue)
-        blockActivitySelection = BlockedActivitySelection.shared(in: context)
-        if let val = blockActivitySelection?.selectedActivity {
-            appBlocker.updateSelection(val)
-        }
     }
         
 }
