@@ -1,7 +1,7 @@
 import SwiftUI
 import FamilyControls
 
-struct AppListView: View {
+struct BlockedAppsListView: View {
     @State private var activitySelection = FamilyActivitySelection()
     @EnvironmentObject var appBlocker: AppBlocker
     
