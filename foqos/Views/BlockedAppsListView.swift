@@ -2,16 +2,43 @@ import SwiftUI
 import FamilyControls
 
 struct BlockedAppsListView: View {
+    @Environment(\.modelContext) private var context
+    
+    @State private var blockActivitySelection: BlockedActivitySelection?
     @State private var activitySelection = FamilyActivitySelection()
+    
     @EnvironmentObject var appBlocker: AppBlocker
     
     var body: some View {
         NavigationView {
             FamilyActivityPicker(selection: $activitySelection)
-                .navigationTitle("Select Apps to Block")
         }
         .onChange(of: activitySelection) { oldValue, newValue in
-            appBlocker.updateSelection(newValue)
+            updateBlockedActivitySelection(newValue: newValue)
+        }.onAppear() {
+            loadBlockedActivitySelection()
         }
     }
+    
+    private func loadBlockedActivitySelection() {
+        blockActivitySelection = BlockedActivitySelection.shared(in: context)
+        if let val = blockActivitySelection?.selectedActivity {
+            activitySelection = val
+            appBlocker.updateSelection(val)
+        }
+    }
+    
+    private func updateBlockedActivitySelection(newValue: FamilyActivitySelection) {
+        BlockedActivitySelection.updateShared(in: context, with: newValue)
+        blockActivitySelection = BlockedActivitySelection.shared(in: context)
+        if let val = blockActivitySelection?.selectedActivity {
+            appBlocker.updateSelection(val)
+        }
+    }
+        
+}
+
+#Preview {
+    BlockedAppsListView()
+        .environmentObject(AppBlocker())
 }

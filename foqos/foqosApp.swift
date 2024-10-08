@@ -17,6 +17,6 @@ struct foqosApp: App {
             ContentView()
                 .environmentObject(appBlocker)
         }
-        .modelContainer(for: BlockedActivity.self)
+        .modelContainer(for: BlockedActivitySelection.self)
     }
 }

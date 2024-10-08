@@ -8,7 +8,7 @@ struct ContentView: View {
                     Label("Home", systemImage: "house")
                 }
             
-            AppListView()
+            BlockedAppsListView()
                 .tabItem {
                     Label("Apps", systemImage: "app.badge")
                 }
