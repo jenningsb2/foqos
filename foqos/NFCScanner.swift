@@ -18,7 +18,7 @@ class NFCScanner: NSObject, ObservableObject {
         
         print("NFC available, creating session...")
         nfcSession = NFCTagReaderSession(pollingOption: [.iso14443, .iso15693], delegate: self, queue: nil)
-        nfcSession?.alertMessage = "Hold your iPhone near an NFC tag."
+        nfcSession?.alertMessage = "Hold your iPhone near an NFC tag to start focus."
         nfcSession?.begin()
         
         print("NFC session begun")

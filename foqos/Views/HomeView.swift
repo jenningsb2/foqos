@@ -3,18 +3,12 @@ import SwiftUI
 struct HomeView: View {
     @EnvironmentObject var appBlocker: AppBlocker
     
-    @State private var lastScannedTag: String?
     @StateObject private var nfcScanner = NFCScanner()
     
     var body: some View {
         VStack {
             Text("NFC App Blocker")
                 .font(.largeTitle)
-            
-            if let tag = lastScannedTag {
-                Text("Last scanned tag: \(tag)")
-                    .padding()
-            }
             
             Button("Scan NFC") {
                 nfcScanner.scan()
@@ -33,10 +27,7 @@ struct HomeView: View {
                 .font(.subheadline)
                 .padding(.top)
         }
-        .onChange(of: lastScannedTag) { _, _ in
-            appBlocker.toggleBlocking()
-        }
-        .onChange(of: nfcScanner.scannedNFCTag) { oldValue, newValue in
+        .onChange(of: nfcScanner.scannedNFCTag) { _, newValue in
             print("NFC Tag has been scanned with the following value \(newValue)")
         }
         .onAppear {
