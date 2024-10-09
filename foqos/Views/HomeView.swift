@@ -2,36 +2,48 @@ import SwiftUI
 
 struct HomeView: View {
     @EnvironmentObject var appBlocker: AppBlocker
-    
     @StateObject private var nfcScanner = NFCScanner()
     
     var body: some View {
-        VStack {
-            Text("NFC App Blocker")
-                .font(.largeTitle)
+        VStack(alignment: .leading, spacing: 20) {
+            VStack(alignment: .leading, spacing: 5) {
+                Text("Time in Focus")
+                    .font(.headline)
+                    .fontWeight(.regular)
+                    .foregroundColor(.secondary)
+                
+                Text("00:00:00")
+                    .font(.system(size: 80))
+                    .fontWeight(.semibold)
+                    .foregroundColor(.primary)
+            }.padding(.top, 20)
             
-            Button("Scan NFC") {
+            GroupBox {
+                WeeklyBarChart()
+            } label: {
+                Text("Weekly focus")
+                    .foregroundColor(.secondary)
+                    .padding(.bottom, 20)
+            }.cornerRadius(10)
+            
+            Spacer()
+            ActionButton(title: "Scan to start") {
                 nfcScanner.scan()
             }
-            .padding()
-            .background(Color.blue)
-            .foregroundColor(.white)
-            .cornerRadius(10)
-            
-            Text("Block Status: \(appBlocker.isBlocking ? "Active" : "Inactive")")
-                .font(.headline)
-                .padding()
-                .foregroundColor(appBlocker.isBlocking ? .red : .green)
-            
-            Text("Blocked Apps are set in the Apps tab")
-                .font(.subheadline)
-                .padding(.top)
-        }
+            Spacer()
+        }.padding(.horizontal, 20)
+        .frame(maxWidth: .infinity, alignment: .leading)
         .onChange(of: nfcScanner.scannedNFCTag) { _, newValue in
-            print("NFC Tag has been scanned with the following value \(newValue)")
+            // TODO: do something with the newValue
         }
         .onAppear {
             appBlocker.requestAuthorization()
         }
     }
 }
+
+#Preview {
+    HomeView()
+        .environmentObject(AppBlocker())
+}
+

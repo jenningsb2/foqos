@@ -6,13 +6,9 @@ struct SettingsView: View {
     var body: some View {
         NavigationView {
             Form {
-                Section(header: Text("Notifications")) {
-                    Toggle("Enable Notifications", isOn: $enableNotifications)
-                }
-                
                 Section(header: Text("About")) {
                     Text("NFC App Blocker v1.0")
-                    Text("Created by Your Name")
+                    Text("Created by Amibition Software")
                 }
             }
             .navigationTitle("Settings")
