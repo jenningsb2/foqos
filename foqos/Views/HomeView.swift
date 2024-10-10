@@ -1,8 +1,15 @@
 import SwiftUI
+import FamilyControls
 
 struct HomeView: View {
+    @Environment(\.modelContext) private var context
+    
     @EnvironmentObject var appBlocker: AppBlocker
     @StateObject private var nfcScanner = NFCScanner()
+    
+    @State var activitySelection = FamilyActivitySelection()
+    @State private var isBlockedListPresented = false
+    @State private var blockActivitySelection: BlockedActivitySelection?
     
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
@@ -34,7 +41,9 @@ struct HomeView: View {
                         title: "Apps to block",
                         subtitle: nil,
                         hasDisclosure: true,
-                        action: { print("Airplane mode toggled") }
+                        action: {
+                            isBlockedListPresented = true
+                        }
                     )
                     MenuItem(
                         icon: "cart.fill",
@@ -65,14 +74,33 @@ struct HomeView: View {
                 nfcScanner.scan()
             }
         }.padding(.horizontal, 20)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .onChange(of: nfcScanner.scannedNFCTag) { _, newValue in
-            // TODO: do something with the newValue
-        }
-        .onAppear {
-            appBlocker.requestAuthorization()
+            .familyActivityPicker(isPresented: $isBlockedListPresented,
+                                  selection: $activitySelection)
+            .onChange(of: activitySelection) { _oldValue, newSelection in
+                updateBlockedActivitySelection(newValue: newSelection)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .onChange(of: nfcScanner.scannedNFCTag) { _, newValue in
+                // TODO: do something with the newValue
+            }
+            .onAppear {
+                appBlocker.requestAuthorization()
+                
+                loadBlockedActivitySelection()
+            }
+    }
+    
+    private func loadBlockedActivitySelection() {
+        blockActivitySelection = BlockedActivitySelection.shared(in: context)
+        if let val = blockActivitySelection?.selectedActivity {
+            activitySelection = val
         }
     }
+    
+    private func updateBlockedActivitySelection(newValue: FamilyActivitySelection) {
+        BlockedActivitySelection.updateShared(in: context, with: newValue)
+    }
+       
 }
 
 #Preview {
