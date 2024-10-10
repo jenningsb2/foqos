@@ -7,9 +7,9 @@ struct HomeView: View {
     @EnvironmentObject var appBlocker: AppBlocker
     @StateObject private var nfcScanner = NFCScanner()
     
+    @State private var isAppListPresent = false
     @State var activitySelection = FamilyActivitySelection()
-    @State private var isBlockedListPresented = false
-    @State private var blockActivitySelection: BlockedActivitySelection?
+    @State var blocking = false
     
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
@@ -42,7 +42,7 @@ struct HomeView: View {
                         subtitle: nil,
                         hasDisclosure: true,
                         action: {
-                            isBlockedListPresented = true
+                            isAppListPresent = true
                         }
                     )
                     MenuItem(
@@ -70,43 +70,65 @@ struct HomeView: View {
             
             Spacer()
             ActionButton(title: "Scan to focus") {
-                startBlocking()
+                toggleBlocking()
             }
         }.padding(.horizontal, 20)
-            .familyActivityPicker(isPresented: $isBlockedListPresented,
+            .familyActivityPicker(isPresented: $isAppListPresent,
                                   selection: $activitySelection)
             .onChange(of: activitySelection) { _, newSelection in
                 updateBlockedActivitySelection(newValue: activitySelection)
             }
+            .onChange(of: blocking) { _, newBlocking in
+                updateBlockedActivityBlocking(newValue: newBlocking)
+            }
             .frame(maxWidth: .infinity, alignment: .leading)
             .onChange(of: nfcScanner.scannedNFCTag) { _, newValue in
-                // TODO: do something with the newValue
+                // TODO: call toggle blocking here
             }
             .onAppear {
                 loadApp()
             }
     }
     
+    private func toggleBlocking() {
+        if blocking {
+            stopBlocking()
+            return
+        }
+        
+        startBlocking()
+    }
+
     private func startBlocking() {
-        nfcScanner.scan()
-        print("Blocking now...")
+        print("Starting app blocks...")
+        
         appBlocker.activateRestrictions(selection: activitySelection)
+        blocking = true
+    }
+    
+    private func stopBlocking() {
+        print("Stopping app blocks...")
+        
+        appBlocker.deactivateRestrictions()
+        blocking = false
     }
     
     private func loadApp() {
         appBlocker.requestAuthorization()
-        loadBlockedActivitySelection()
+        
+        let blockActivitySelection = BlockedActivitySelection.shared(in: context)
+        activitySelection = blockActivitySelection.selectedActivity
+        blocking = blockActivitySelection.isBlocking
     }
     
-    private func loadBlockedActivitySelection() {
-        blockActivitySelection = BlockedActivitySelection.shared(in: context)
-        if let val = blockActivitySelection?.selectedActivity {
-            activitySelection = val
-        }
+    private func updateBlockedActivitySelection(
+        newValue: FamilyActivitySelection
+    ) {
+        BlockedActivitySelection.updateSelection(in: context, with: newValue)
     }
     
-    private func updateBlockedActivitySelection(newValue: FamilyActivitySelection) {
-        BlockedActivitySelection.updateShared(in: context, with: newValue)
+    private func updateBlockedActivityBlocking(newValue: Bool) {
+        BlockedActivitySelection.updateBlocking(in: context, with: newValue)
     }
        
 }

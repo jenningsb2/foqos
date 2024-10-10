@@ -20,7 +20,6 @@ class AppBlocker: ObservableObject {
 
         let blockedApps = Set(applicationTokens.map { Application(token: $0) })
         store.application.blockedApplications = blockedApps
-        store.shield.applications = applicationTokens
         
         // Set up a DeviceActivitySchedule
         let schedule = DeviceActivitySchedule(

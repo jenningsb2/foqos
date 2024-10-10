@@ -6,11 +6,6 @@
 	objectVersion = 77;
 	objects = {
 
-/* Begin PBXBuildFile section */
-		80DBF6142CB776D100EEA8A6 /* DeviceActivity.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 80DBF6132CB776D100EEA8A6 /* DeviceActivity.framework */; };
-		80DBF61C2CB776D100EEA8A6 /* foqosblockedtracker.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 80DBF6112CB776D100EEA8A6 /* foqosblockedtracker.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
-/* End PBXBuildFile section */
-
 /* Begin PBXContainerItemProxy section */
 		801B20A72CB363A20073E9E2 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -26,13 +21,6 @@
 			remoteGlobalIDString = 801B20942CB363A10073E9E2;
 			remoteInfo = foqos;
 		};
-		80DBF61A2CB776D100EEA8A6 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 801B208D2CB363A10073E9E2 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 80DBF6102CB776D100EEA8A6;
-			remoteInfo = foqosblockedtracker;
-		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -42,7 +30,6 @@
 			dstPath = "";
 			dstSubfolderSpec = 13;
 			files = (
-				80DBF61C2CB776D100EEA8A6 /* foqosblockedtracker.appex in Embed Foundation Extensions */,
 			);
 			name = "Embed Foundation Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -53,19 +40,8 @@
 		801B20952CB363A10073E9E2 /* foqos.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = foqos.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		801B20A62CB363A20073E9E2 /* foqosTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = foqosTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		801B20B02CB363A20073E9E2 /* foqosUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = foqosUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		80DBF6112CB776D100EEA8A6 /* foqosblockedtracker.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = foqosblockedtracker.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		80DBF6132CB776D100EEA8A6 /* DeviceActivity.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = DeviceActivity.framework; path = System/Library/Frameworks/DeviceActivity.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
-
-/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		80DBF6202CB776D100EEA8A6 /* Exceptions for "foqosblockedtracker" folder in "foqosblockedtracker" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				Info.plist,
-			);
-			target = 80DBF6102CB776D100EEA8A6 /* foqosblockedtracker */;
-		};
-/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		801B20972CB363A10073E9E2 /* foqos */ = {
@@ -81,14 +57,6 @@
 		801B20B32CB363A20073E9E2 /* foqosUITests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = foqosUITests;
-			sourceTree = "<group>";
-		};
-		80DBF6152CB776D100EEA8A6 /* foqosblockedtracker */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-				80DBF6202CB776D100EEA8A6 /* Exceptions for "foqosblockedtracker" folder in "foqosblockedtracker" target */,
-			);
-			path = foqosblockedtracker;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -115,14 +83,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		80DBF60E2CB776D100EEA8A6 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				80DBF6142CB776D100EEA8A6 /* DeviceActivity.framework in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -132,7 +92,6 @@
 				801B20972CB363A10073E9E2 /* foqos */,
 				801B20A92CB363A20073E9E2 /* foqosTests */,
 				801B20B32CB363A20073E9E2 /* foqosUITests */,
-				80DBF6152CB776D100EEA8A6 /* foqosblockedtracker */,
 				80DBF6122CB776D100EEA8A6 /* Frameworks */,
 				801B20962CB363A10073E9E2 /* Products */,
 			);
@@ -144,7 +103,6 @@
 				801B20952CB363A10073E9E2 /* foqos.app */,
 				801B20A62CB363A20073E9E2 /* foqosTests.xctest */,
 				801B20B02CB363A20073E9E2 /* foqosUITests.xctest */,
-				80DBF6112CB776D100EEA8A6 /* foqosblockedtracker.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -172,7 +130,6 @@
 			buildRules = (
 			);
 			dependencies = (
-				80DBF61B2CB776D100EEA8A6 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				801B20972CB363A10073E9E2 /* foqos */,
@@ -230,28 +187,6 @@
 			productReference = 801B20B02CB363A20073E9E2 /* foqosUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
-		80DBF6102CB776D100EEA8A6 /* foqosblockedtracker */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 80DBF6212CB776D100EEA8A6 /* Build configuration list for PBXNativeTarget "foqosblockedtracker" */;
-			buildPhases = (
-				80DBF60D2CB776D100EEA8A6 /* Sources */,
-				80DBF60E2CB776D100EEA8A6 /* Frameworks */,
-				80DBF60F2CB776D100EEA8A6 /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			fileSystemSynchronizedGroups = (
-				80DBF6152CB776D100EEA8A6 /* foqosblockedtracker */,
-			);
-			name = foqosblockedtracker;
-			packageProductDependencies = (
-			);
-			productName = foqosblockedtracker;
-			productReference = 80DBF6112CB776D100EEA8A6 /* foqosblockedtracker.appex */;
-			productType = "com.apple.product-type.app-extension";
-		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -273,9 +208,6 @@
 						CreatedOnToolsVersion = 16.0;
 						TestTargetID = 801B20942CB363A10073E9E2;
 					};
-					80DBF6102CB776D100EEA8A6 = {
-						CreatedOnToolsVersion = 16.0;
-					};
 				};
 			};
 			buildConfigurationList = 801B20902CB363A10073E9E2 /* Build configuration list for PBXProject "foqos" */;
@@ -295,7 +227,6 @@
 				801B20942CB363A10073E9E2 /* foqos */,
 				801B20A52CB363A20073E9E2 /* foqosTests */,
 				801B20AF2CB363A20073E9E2 /* foqosUITests */,
-				80DBF6102CB776D100EEA8A6 /* foqosblockedtracker */,
 			);
 		};
 /* End PBXProject section */
@@ -316,13 +247,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		801B20AE2CB363A20073E9E2 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		80DBF60F2CB776D100EEA8A6 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -353,13 +277,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		80DBF60D2CB776D100EEA8A6 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -372,11 +289,6 @@
 			isa = PBXTargetDependency;
 			target = 801B20942CB363A10073E9E2 /* foqos */;
 			targetProxy = 801B20B12CB363A20073E9E2 /* PBXContainerItemProxy */;
-		};
-		80DBF61B2CB776D100EEA8A6 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 80DBF6102CB776D100EEA8A6 /* foqosblockedtracker */;
-			targetProxy = 80DBF61A2CB776D100EEA8A6 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -667,63 +579,6 @@
 			};
 			name = Release;
 		};
-		80DBF61E2CB776D100EEA8A6 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_ENTITLEMENTS = foqosblockedtracker/foqosblockedtracker.entitlements;
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = YR54789JNV;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = foqosblockedtracker/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = foqosblockedtracker;
-				INFOPLIST_KEY_NSHumanReadableCopyright = "";
-				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@executable_path/../../Frameworks",
-				);
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = dev.ambitionsoftware.foqos.foqosblockedtracker;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = iphoneos;
-				SKIP_INSTALL = YES;
-				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = Debug;
-		};
-		80DBF61F2CB776D100EEA8A6 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_ENTITLEMENTS = foqosblockedtracker/foqosblockedtracker.entitlements;
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = YR54789JNV;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = foqosblockedtracker/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = foqosblockedtracker;
-				INFOPLIST_KEY_NSHumanReadableCopyright = "";
-				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@executable_path/../../Frameworks",
-				);
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = dev.ambitionsoftware.foqos.foqosblockedtracker;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = iphoneos;
-				SKIP_INSTALL = YES;
-				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				VALIDATE_PRODUCT = YES;
-			};
-			name = Release;
-		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -759,15 +614,6 @@
 			buildConfigurations = (
 				801B20C12CB363A20073E9E2 /* Debug */,
 				801B20C22CB363A20073E9E2 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		80DBF6212CB776D100EEA8A6 /* Build configuration list for PBXNativeTarget "foqosblockedtracker" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				80DBF61E2CB776D100EEA8A6 /* Debug */,
-				80DBF61F2CB776D100EEA8A6 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
