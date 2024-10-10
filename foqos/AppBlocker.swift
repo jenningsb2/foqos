@@ -6,7 +6,7 @@ import ManagedSettings
 class AppBlocker: ObservableObject {
     @Published var isBlocking = false
     
-    let store = ManagedSettingsStore()
+    let store = ManagedSettingsStore(named: ManagedSettingsStore.Name("foqosAppRestrictions"))
     let center = DeviceActivityCenter()
     
     private var isAuthorized = false
@@ -15,9 +15,12 @@ class AppBlocker: ObservableObject {
     func activateRestrictions(selection: FamilyActivitySelection) {
         print("Starting restrictions...")
         
-        var applications = store.application
+        
         let applicationTokens = selection.applicationTokens
-        applications.blockedApplications = Set(applicationTokens.map { Application(token: $0) })
+
+        let blockedApps = Set(applicationTokens.map { Application(token: $0) })
+        store.application.blockedApplications = blockedApps
+        store.shield.applications = applicationTokens
         
         // Set up a DeviceActivitySchedule
         let schedule = DeviceActivitySchedule(
@@ -26,7 +29,7 @@ class AppBlocker: ObservableObject {
             repeats: true
         )
         
-        let activity = DeviceActivityName("MyActivity")
+        let activity = DeviceActivityName("foqosDeviceActivity")
         let eventCenter = DeviceActivityCenter()
         do {
             try eventCenter.startMonitoring(activity, during: schedule)

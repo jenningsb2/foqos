@@ -75,8 +75,8 @@ struct HomeView: View {
         }.padding(.horizontal, 20)
             .familyActivityPicker(isPresented: $isBlockedListPresented,
                                   selection: $activitySelection)
-            .onChange(of: activitySelection) { _oldValue, newSelection in
-                updateBlockedActivitySelection(newValue: newSelection)
+            .onChange(of: activitySelection) { _, newSelection in
+                updateBlockedActivitySelection(newValue: activitySelection)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             .onChange(of: nfcScanner.scannedNFCTag) { _, newValue in
