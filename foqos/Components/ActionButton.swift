@@ -11,7 +11,7 @@ struct ActionButton: View {
                 .foregroundColor(.white)
                 .frame(maxWidth: .infinity)
                 .frame(height: 56) // Adjust this value to match your desired height
-                .background(Color.blue)
+                .background(Color.indigo)
                 .clipShape(Capsule())
                 .shadow(color: Color.black.opacity(0.1), radius: 5, x: 0, y: 2)
                 .padding(.horizontal, 20)

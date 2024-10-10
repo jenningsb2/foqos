@@ -16,7 +16,7 @@ struct WeeklyBarChart: View {
                 x: .value("Day", item.day),
                 y: .value("Value", item.value)
             )
-            .foregroundStyle(Color.blue)
+            .foregroundStyle(Color.indigo)
             .cornerRadius(10)
         }
         .chartXAxis {
