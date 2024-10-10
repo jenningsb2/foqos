@@ -68,10 +68,9 @@ struct HomeView: View {
                     .padding(.bottom, 20)
             }.cornerRadius(10)
             
-            
             Spacer()
             ActionButton(title: "Scan to focus") {
-                nfcScanner.scan()
+                startBlocking()
             }
         }.padding(.horizontal, 20)
             .familyActivityPicker(isPresented: $isBlockedListPresented,
@@ -84,10 +83,19 @@ struct HomeView: View {
                 // TODO: do something with the newValue
             }
             .onAppear {
-                appBlocker.requestAuthorization()
-                
-                loadBlockedActivitySelection()
+                loadApp()
             }
+    }
+    
+    private func startBlocking() {
+        nfcScanner.scan()
+        print("Blocking now...")
+        appBlocker.activateRestrictions(selection: activitySelection)
+    }
+    
+    private func loadApp() {
+        appBlocker.requestAuthorization()
+        loadBlockedActivitySelection()
     }
     
     private func loadBlockedActivitySelection() {

@@ -9,25 +9,11 @@ class AppBlocker: ObservableObject {
     let store = ManagedSettingsStore()
     let center = DeviceActivityCenter()
     
-    private var activitySelection: FamilyActivitySelection?
     private var isAuthorized = false
     
-    func updateSelection(_ selection: FamilyActivitySelection) {
-        self.activitySelection = selection
-    }
     
-    func toggleBlocking() {
-        isBlocking.toggle()
-        
-        if isBlocking {
-            activateRestrictions()
-        } else {
-            deactivateRestrictions()
-        }
-    }
-    
-    func activateRestrictions() {
-        guard let selection = activitySelection else { return }
+    func activateRestrictions(selection: FamilyActivitySelection) {
+        print("Starting restrictions...")
         
         var applications = store.application
         let applicationTokens = selection.applicationTokens
