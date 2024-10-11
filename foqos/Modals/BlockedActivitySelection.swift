@@ -7,12 +7,10 @@ import FamilyControls
 class BlockedActivitySelection {
     @Attribute(.unique) var id: String
     var selectedActivity: FamilyActivitySelection
-    var isBlocking: Bool = false
     
     init(id: String = "BlockedActivitySelection", selectedActivity: FamilyActivitySelection = FamilyActivitySelection()) {
         self.id = id
         self.selectedActivity = selectedActivity
-        self.isBlocking = false
     }
     
     static func shared(in context: ModelContext) -> BlockedActivitySelection {
@@ -40,12 +38,6 @@ class BlockedActivitySelection {
     static func updateSelection(in context: ModelContext, with selection: FamilyActivitySelection) {
         let instance = shared(in: context)
         instance.selectedActivity = selection
-        try? context.save()
-    }
-    
-    static func updateBlocking(in context: ModelContext, with isBlocking: Bool) {
-        let instance = shared(in: context)
-        instance.isBlocking = isBlocking
         try? context.save()
     }
 }

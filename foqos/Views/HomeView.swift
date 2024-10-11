@@ -9,7 +9,14 @@ struct HomeView: View {
     
     @State private var isAppListPresent = false
     @State var activitySelection = FamilyActivitySelection()
-    @State var blocking = false
+    @State var recentSession: BlockedSession?
+    
+    @State private var elapsedTime: TimeInterval = 0
+    @State private var timer: Timer?
+    
+    var isBlocking: Bool {
+        return recentSession?.isActive == true
+    }
     
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
@@ -19,7 +26,7 @@ struct HomeView: View {
                     .fontWeight(.regular)
                     .foregroundColor(.secondary)
                 
-                Text("00:00:00")
+                Text(timeString(from: elapsedTime))
                     .font(.system(size: 80))
                     .fontWeight(.semibold)
                     .foregroundColor(.primary)
@@ -69,7 +76,7 @@ struct HomeView: View {
             }.cornerRadius(10)
             
             Spacer()
-            ActionButton(title: "Scan to focus") {
+            ActionButton(title: isBlocking ? "Scan to stop focus" : "Scan to start focus") {
                 toggleBlocking()
             }
         }.padding(.horizontal, 20)
@@ -78,47 +85,50 @@ struct HomeView: View {
             .onChange(of: activitySelection) { _, newSelection in
                 updateBlockedActivitySelection(newValue: activitySelection)
             }
-            .onChange(of: blocking) { _, newBlocking in
-                updateBlockedActivityBlocking(newValue: newBlocking)
-            }
             .frame(maxWidth: .infinity, alignment: .leading)
             .onChange(of: nfcScanner.scannedNFCTag) { _, newValue in
                 // TODO: call toggle blocking here
             }
             .onAppear {
                 loadApp()
+                startTimer()
+            }
+            .onDisappear {
+                stopTimer()
             }
     }
     
     private func toggleBlocking() {
-        if blocking {
+        if isBlocking {
             stopBlocking()
-            return
+        } else {
+            startBlocking()
         }
         
-        startBlocking()
+        resetTimer()
     }
 
     private func startBlocking() {
         print("Starting app blocks...")
         
         appBlocker.activateRestrictions(selection: activitySelection)
-        blocking = true
+        recentSession = BlockedSession.createSession(in: context, withTag: "test")
     }
     
     private func stopBlocking() {
         print("Stopping app blocks...")
         
         appBlocker.deactivateRestrictions()
-        blocking = false
+        recentSession?.endSession()
+        startTimer()
     }
     
     private func loadApp() {
         appBlocker.requestAuthorization()
         
-        let blockActivitySelection = BlockedActivitySelection.shared(in: context)
-        activitySelection = blockActivitySelection.selectedActivity
-        blocking = blockActivitySelection.isBlocking
+        activitySelection = BlockedActivitySelection.shared(in: context).selectedActivity
+        recentSession = BlockedSession.mostRecentActiveSession(in: context)
+        stopTimer()
     }
     
     private func updateBlockedActivitySelection(
@@ -127,10 +137,29 @@ struct HomeView: View {
         BlockedActivitySelection.updateSelection(in: context, with: newValue)
     }
     
-    private func updateBlockedActivityBlocking(newValue: Bool) {
-        BlockedActivitySelection.updateBlocking(in: context, with: newValue)
+    private func startTimer() {
+        timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { _ in
+            if let startTime = recentSession?.startTime {
+                elapsedTime = Date().timeIntervalSince(startTime)
+            }
+        }
     }
-       
+    
+    private func stopTimer() {
+        timer?.invalidate()
+        timer = nil
+    }
+    
+    private func resetTimer() {
+        elapsedTime = 0
+    }
+    
+    private func timeString(from timeInterval: TimeInterval) -> String {
+        let hours = Int(timeInterval) / 3600
+        let minutes = Int(timeInterval) / 60 % 60
+        let seconds = Int(timeInterval) % 60
+        return String(format: "%02d:%02d:%02d", hours, minutes, seconds)
+    }
 }
 
 #Preview {

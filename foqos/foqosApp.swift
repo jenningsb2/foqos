@@ -17,6 +17,6 @@ struct foqosApp: App {
             HomeView()
                 .environmentObject(appBlocker)
         }
-        .modelContainer(for: BlockedActivitySelection.self)
+        .modelContainer(for: [BlockedActivitySelection.self, BlockedSession.self])
     }
 }

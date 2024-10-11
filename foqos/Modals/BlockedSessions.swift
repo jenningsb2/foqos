@@ -2,7 +2,8 @@ import Foundation
 import SwiftData
 
 @Model
-final class BlockedSession {
+class BlockedSession {
+    @Attribute(.unique) var id: String
     var tag: String
     
     var startTime: Date
@@ -18,6 +19,7 @@ final class BlockedSession {
     }
     
     init(tag: String) {
+        self.id = UUID().uuidString
         self.tag = tag
         
         self.startTime = Date()
@@ -25,10 +27,6 @@ final class BlockedSession {
     
     func endSession() {
         self.endTime = Date()
-    }
-    
-    func endSession(at date: Date) {
-        self.endTime = date
     }
     
     static func mostRecentActiveSession(in context: ModelContext) -> BlockedSession? {
