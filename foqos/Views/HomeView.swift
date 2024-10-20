@@ -66,8 +66,6 @@ struct HomeView: View {
             
             InactiveBlockedSessionView(sessions: recentCompletedSessions ?? [])
             
-            Spacer()
-            
             ActionButton(
                 title: isBlocking ? "Scan to stop focus" : "Scan to start focus"
             ) {
@@ -99,7 +97,7 @@ struct HomeView: View {
             startBlocking()
         }
         
-        resetTimer()
+        reloadApp()
     }
 
     private func startBlocking() {
@@ -127,6 +125,12 @@ struct HomeView: View {
         recentCompletedSessions = BlockedSession
             .recentInactiveSessions(in: context)
         stopTimer()
+    }
+    
+    private func reloadApp() {
+        resetTimer()
+        recentCompletedSessions = BlockedSession
+            .recentInactiveSessions(in: context)
     }
     
     private func updateBlockedActivitySelection(
