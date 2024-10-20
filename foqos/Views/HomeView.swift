@@ -37,7 +37,7 @@ struct HomeView: View {
                 GridRow {
                     ActionCard(
                         icon: "hand.raised.fill",
-                        count: 8,
+                        count: 0,
                         label: "Blocked Apps",
                         color: .red
                     ) {
