@@ -67,7 +67,8 @@ struct HomeView: View {
             InactiveBlockedSessionView(sessions: recentCompletedSessions ?? [])
             
             ActionButton(
-                title: isBlocking ? "Scan to stop focus" : "Scan to start focus"
+                title: isBlocking ? "Scan to stop focus" : "Scan to start focus",
+                backgroundColor: isBlocking ? Color.red : Color.indigo
             ) {
                 nfcScanner.scan()
             }
@@ -83,7 +84,6 @@ struct HomeView: View {
             }
             .onAppear {
                 loadApp()
-                startTimer()
             }
             .onDisappear {
                 stopTimer()
@@ -99,7 +99,7 @@ struct HomeView: View {
         
         reloadApp()
     }
-
+    
     private func startBlocking() {
         print("Starting app blocks...")
         
@@ -124,7 +124,7 @@ struct HomeView: View {
         activeSession = BlockedSession.mostRecentActiveSession(in: context)
         recentCompletedSessions = BlockedSession
             .recentInactiveSessions(in: context)
-        stopTimer()
+        startTimer()
     }
     
     private func reloadApp() {

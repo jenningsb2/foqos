@@ -14,13 +14,13 @@ struct EmptyView: View {
                 .frame(width: 100, height: 100)
                 .foregroundColor(.gray)
             
-            Spacer()
-            
             Text(headingText)
                 .font(.headline)
                 .multilineTextAlignment(.center)
                 .foregroundColor(.secondary)
                 .padding()
+            
+            Spacer()
         }
     }
 }
