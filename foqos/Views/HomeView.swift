@@ -35,23 +35,56 @@ struct HomeView: View {
             
             Grid(horizontalSpacing: 10, verticalSpacing: 16) {
                 GridRow {
-                    ActionCard(icon: "hand.raised.fill", count: 8, label: "Blocked Apps", color: .red) {
+                    ActionCard(
+                        icon: "hand.raised.fill",
+                        count: 8,
+                        label: "Blocked Apps",
+                        color: .red
+                    ) {
                         isAppListPresent = true
                     }
-                    ActionCard(icon: "cart.fill", count: nil, label: "Purschase NFC tags", color: .gray) {
+                    ActionCard(
+                        icon: "cart.fill",
+                        count: nil,
+                        label: "Purschase NFC tags",
+                        color: .gray
+                    ) {
                         print("Buy tags")
                     }
                 }
                 GridRow {
-                    ActionCard(icon: "heart.fill", count: nil, label: "Donate", color: .green) {
+                    ActionCard(
+                        icon: "heart.fill",
+                        count: nil,
+                        label: "Donate",
+                        color: .green
+                    ) {
                         print("Thanks for the donation")
                     }
                 }
             }
             
+            List {
+                ForEach(recentCompletedSessions ?? []) { session in
+                    InactiveBlockedSessionRow(session: session)
+                        .listRowSeparator(.hidden)
+                        .listRowInsets(
+                            EdgeInsets(
+                                top: 8,
+                                leading: 16,
+                                bottom: 8,
+                                trailing: 16
+                            )
+                        )
+                }
+            }
+            .listStyle(PlainListStyle())
+            
             Spacer()
             
-            ActionButton(title: isBlocking ? "Scan to stop focus" : "Scan to start focus") {
+            ActionButton(
+                title: isBlocking ? "Scan to stop focus" : "Scan to start focus"
+            ) {
                 toggleBlocking()
             }
         }.padding(.horizontal, 20)
@@ -87,7 +120,8 @@ struct HomeView: View {
         print("Starting app blocks...")
         
         appBlocker.activateRestrictions(selection: activitySelection)
-        activeSession = BlockedSession.createSession(in: context, withTag: "test")
+        activeSession = BlockedSession
+            .createSession(in: context, withTag: "test")
     }
     
     private func stopBlocking() {
@@ -101,9 +135,11 @@ struct HomeView: View {
     private func loadApp() {
         appBlocker.requestAuthorization()
         
-        activitySelection = BlockedActivitySelection.shared(in: context).selectedActivity
+        activitySelection = BlockedActivitySelection
+            .shared(in: context).selectedActivity
         activeSession = BlockedSession.mostRecentActiveSession(in: context)
-        recentCompletedSessions = BlockedSession.recentInactiveSessions(in: context)
+        recentCompletedSessions = BlockedSession
+            .recentInactiveSessions(in: context)
         stopTimer()
     }
     
