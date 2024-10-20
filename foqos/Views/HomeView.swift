@@ -9,13 +9,14 @@ struct HomeView: View {
     
     @State private var isAppListPresent = false
     @State var activitySelection = FamilyActivitySelection()
-    @State var recentSession: BlockedSession?
+    @State var activeSession: BlockedSession?
+    @State var recentCompletedSessions: [BlockedSession]?
     
     @State private var elapsedTime: TimeInterval = 0
     @State private var timer: Timer?
     
     var isBlocking: Bool {
-        return recentSession?.isActive == true
+        return activeSession?.isActive == true
     }
     
     var body: some View {
@@ -23,12 +24,12 @@ struct HomeView: View {
             VStack(alignment: .leading, spacing: 5) {
                 Text("Time in Focus")
                     .font(.headline)
-                    .fontWeight(.regular)
+                    .fontWeight(.semibold)
                     .foregroundColor(.secondary)
                 
                 Text(timeString(from: elapsedTime))
                     .font(.system(size: 80))
-                    .fontWeight(.semibold)
+                    .fontWeight(.bold)
                     .foregroundColor(.primary)
             }.padding(.top, 20)
             
@@ -86,14 +87,14 @@ struct HomeView: View {
         print("Starting app blocks...")
         
         appBlocker.activateRestrictions(selection: activitySelection)
-        recentSession = BlockedSession.createSession(in: context, withTag: "test")
+        activeSession = BlockedSession.createSession(in: context, withTag: "test")
     }
     
     private func stopBlocking() {
         print("Stopping app blocks...")
         
         appBlocker.deactivateRestrictions()
-        recentSession?.endSession()
+        activeSession?.endSession()
         startTimer()
     }
     
@@ -101,7 +102,8 @@ struct HomeView: View {
         appBlocker.requestAuthorization()
         
         activitySelection = BlockedActivitySelection.shared(in: context).selectedActivity
-        recentSession = BlockedSession.mostRecentActiveSession(in: context)
+        activeSession = BlockedSession.mostRecentActiveSession(in: context)
+        recentCompletedSessions = BlockedSession.recentInactiveSessions(in: context)
         stopTimer()
     }
     
@@ -113,7 +115,7 @@ struct HomeView: View {
     
     private func startTimer() {
         timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { _ in
-            if let startTime = recentSession?.startTime {
+            if let startTime = activeSession?.startTime {
                 elapsedTime = Date().timeIntervalSince(startTime)
             }
         }

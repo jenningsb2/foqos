@@ -44,4 +44,14 @@ class BlockedSession {
         context.insert(newSession)
         return newSession
     }
+    
+    static func recentInactiveSessions(in context: ModelContext, limit: Int = 50) -> [BlockedSession] {
+        var descriptor = FetchDescriptor<BlockedSession>(
+            predicate: #Predicate { $0.endTime != nil },
+            sortBy: [SortDescriptor(\.endTime, order: .reverse)]
+        )
+        descriptor.fetchLimit = limit
+        
+        return (try? context.fetch(descriptor)) ?? []
+    }
 }
