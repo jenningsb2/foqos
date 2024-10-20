@@ -24,12 +24,12 @@ struct HomeView: View {
             VStack(alignment: .leading, spacing: 5) {
                 Text("Time in Focus")
                     .font(.headline)
-                    .fontWeight(.semibold)
+                    .fontWeight(.regular)
                     .foregroundColor(.secondary)
                 
                 Text(timeString(from: elapsedTime))
                     .font(.system(size: 80))
-                    .fontWeight(.bold)
+                    .fontWeight(.semibold)
                     .foregroundColor(.primary)
             }.padding(.top, 20)
             
@@ -64,23 +64,7 @@ struct HomeView: View {
                 }
             }
             
-            Text("Sessions")
-            
-            List {
-                ForEach(recentCompletedSessions ?? []) { session in
-                    InactiveBlockedSessionRow(session: session)
-                        .listRowSeparator(.hidden)
-                        .listRowInsets(
-                            EdgeInsets(
-                                top: 8,
-                                leading: 0,
-                                bottom: 8,
-                                trailing: 0
-                            )
-                        )
-                }
-            }
-            .listStyle(PlainListStyle())
+            InactiveBlockedSessionView(sessions: recentCompletedSessions ?? [])
             
             Spacer()
             
@@ -131,7 +115,7 @@ struct HomeView: View {
         
         appBlocker.deactivateRestrictions()
         activeSession?.endSession()
-        startTimer()
+        stopTimer()
     }
     
     private func loadApp() {
