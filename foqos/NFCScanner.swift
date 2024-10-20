@@ -98,9 +98,9 @@ extension NFCScanner: NFCTagReaderSessionDelegate {
         )
         
         tag.sendCommand(apdu: apdu) {
- data,
- sw1,
- sw2,
+            data,
+            sw1,
+            sw2,
             error in
             if let error = error {
                 session
@@ -150,7 +150,8 @@ extension NFCScanner: NFCTagReaderSessionDelegate {
         session: NFCTagReaderSession
     ) {
         DispatchQueue.main.async {
-            self.scannedNFCTag = result
+            let timeInterval = Date().timeIntervalSince1970
+            self.scannedNFCTag = "\(result). Time Interval: \(timeInterval)"
             self.isScanning = false
             session.invalidate()
         }
