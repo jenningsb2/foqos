@@ -32,50 +32,24 @@ struct HomeView: View {
                     .foregroundColor(.primary)
             }.padding(.top, 20)
             
-            GroupBox {
-                WeeklyBarChart()
-            } label: {
-                Text("Weekly focus time")
-                    .foregroundColor(.secondary)
-                    .padding(.bottom, 20)
-            }.cornerRadius(10)
-            
-            GroupBox {
-                Section {
-                    MenuItem(
-                        icon: "hand.raised.fill",
-                        iconColor: .red,
-                        title: "Apps to block",
-                        subtitle: nil,
-                        hasDisclosure: true,
-                        action: {
-                            isAppListPresent = true
-                        }
-                    )
-                    MenuItem(
-                        icon: "cart.fill",
-                        iconColor: .gray,
-                        title: "Purschase NFC tags",
-                        subtitle: nil,
-                        hasDisclosure: true,
-                        action: { print("Airplane mode toggled") }
-                    )
-                    MenuItem(
-                        icon: "heart.fill",
-                        iconColor: .green,
-                        title: "Donate",
-                        subtitle: nil,
-                        hasDisclosure: true,
-                        action: { print("Airplane mode toggled") }
-                    )
+            Grid(horizontalSpacing: 10, verticalSpacing: 16) {
+                GridRow {
+                    ActionCard(icon: "hand.raised.fill", count: 8, label: "Blocked Apps", color: .red) {
+                        isAppListPresent = true
+                    }
+                    ActionCard(icon: "cart.fill", count: nil, label: "Purschase NFC tags", color: .gray) {
+                        print("Buy tags")
+                    }
                 }
-            } label: {
-                Text("Settings")
-                    .foregroundColor(.secondary)
-                    .padding(.bottom, 20)
-            }.cornerRadius(10)
+                GridRow {
+                    ActionCard(icon: "heart.fill", count: nil, label: "Donate", color: .green) {
+                        print("Thanks for the donation")
+                    }
+                }
+            }
             
             Spacer()
+            
             ActionButton(title: isBlocking ? "Scan to stop focus" : "Scan to start focus") {
                 toggleBlocking()
             }

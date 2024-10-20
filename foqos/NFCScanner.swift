@@ -79,7 +79,7 @@ extension NFCScanner: NFCTagReaderSessionDelegate {
                 return
             }
             
-            let result = "ISO7816 AID: \(data.hexEncodedString() ?? "N/A"), Status: \(String(format: "%02X %02X", sw1, sw2))"
+            let result = "ISO7816 AID: \(data.hexEncodedString()), Status: \(String(format: "%02X %02X", sw1, sw2))"
             self.completeScanning(with: result, session: session)
         }
     }
