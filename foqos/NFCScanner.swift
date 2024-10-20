@@ -17,7 +17,11 @@ class NFCScanner: NSObject, ObservableObject {
         }
         
         print("NFC available, creating session...")
-        nfcSession = NFCTagReaderSession(pollingOption: [.iso14443, .iso15693], delegate: self, queue: nil)
+        nfcSession = NFCTagReaderSession(
+            pollingOption: [.iso14443, .iso15693],
+            delegate: self,
+            queue: nil
+        )
         nfcSession?.alertMessage = "Hold your iPhone near an NFC tag to start focus."
         nfcSession?.begin()
         
@@ -29,16 +33,23 @@ class NFCScanner: NSObject, ObservableObject {
 extension NFCScanner: NFCTagReaderSessionDelegate {
     func tagReaderSessionDidBecomeActive(_ session: NFCTagReaderSession) {
         // This method is called when the session begins.
+        return
     }
     
-    func tagReaderSession(_ session: NFCTagReaderSession, didInvalidateWithError error: Error) {
+    func tagReaderSession(
+        _ session: NFCTagReaderSession,
+        didInvalidateWithError error: Error
+    ) {
         DispatchQueue.main.async {
             self.isScanning = false
             self.errorMessage = error.localizedDescription
         }
     }
     
-    func tagReaderSession(_ session: NFCTagReaderSession, didDetect tags: [NFCTag]) {
+    func tagReaderSession(
+        _ session: NFCTagReaderSession,
+        didDetect tags: [NFCTag]
+    ) {
         if tags.count > 1 {
             session.alertMessage = "More than 1 tag detected. Please present only 1 tag."
             return
@@ -50,7 +61,10 @@ extension NFCScanner: NFCTagReaderSessionDelegate {
         
         session.connect(to: tag) { error in
             if let error = error {
-                session.invalidate(errorMessage: "Connection error: \(error.localizedDescription)")
+                session
+                    .invalidate(
+                        errorMessage: "Connection error: \(error.localizedDescription)"
+                    )
                 return
             }
             
@@ -69,13 +83,30 @@ extension NFCScanner: NFCTagReaderSessionDelegate {
         }
     }
     
-    private func handleISO7816Tag(_ tag: NFCISO7816Tag, session: NFCTagReaderSession) {
+    private func handleISO7816Tag(
+        _ tag: NFCISO7816Tag,
+        session: NFCTagReaderSession
+    ) {
         // Example: Read AID (Application Identifier)
-        let apdu = NFCISO7816APDU(instructionClass: 0x00, instructionCode: 0xA4, p1Parameter: 0x04, p2Parameter: 0x00, data: Data(), expectedResponseLength: -1)
+        let apdu = NFCISO7816APDU(
+            instructionClass: 0x00,
+            instructionCode: 0xA4,
+            p1Parameter: 0x04,
+            p2Parameter: 0x00,
+            data: Data(),
+            expectedResponseLength: -1
+        )
         
-        tag.sendCommand(apdu: apdu) { data, sw1, sw2, error in
+        tag.sendCommand(apdu: apdu) {
+ data,
+ sw1,
+ sw2,
+            error in
             if let error = error {
-                session.invalidate(errorMessage: "Error reading ISO7816 tag: \(error.localizedDescription)")
+                session
+                    .invalidate(
+                        errorMessage: "Error reading ISO7816 tag: \(error.localizedDescription)"
+                    )
                 return
             }
             
@@ -84,28 +115,40 @@ extension NFCScanner: NFCTagReaderSessionDelegate {
         }
     }
     
-    private func handleFeliCaTag(_ tag: NFCFeliCaTag, session: NFCTagReaderSession) {
+    private func handleFeliCaTag(
+        _ tag: NFCFeliCaTag,
+        session: NFCTagReaderSession
+    ) {
         // Example: Read FeliCa System Code
         let systemCode = tag.currentSystemCode.hexEncodedString()
         let result = "FeliCa System Code: \(systemCode)"
         self.completeScanning(with: result, session: session)
     }
     
-    private func handleISO15693Tag(_ tag: NFCISO15693Tag, session: NFCTagReaderSession) {
+    private func handleISO15693Tag(
+        _ tag: NFCISO15693Tag,
+        session: NFCTagReaderSession
+    ) {
         // Example: Read ISO15693 UID
         let uid = tag.identifier.hexEncodedString()
         let result = "ISO15693 UID: \(uid)"
         self.completeScanning(with: result, session: session)
     }
     
-    private func handleMiFareTag(_ tag: NFCMiFareTag, session: NFCTagReaderSession) {
+    private func handleMiFareTag(
+        _ tag: NFCMiFareTag,
+        session: NFCTagReaderSession
+    ) {
         // Example: Read MIFARE UID
         let uid = tag.identifier.hexEncodedString()
         let result = "MIFARE UID: \(uid)"
         self.completeScanning(with: result, session: session)
     }
     
-    private func completeScanning(with result: String, session: NFCTagReaderSession) {
+    private func completeScanning(
+        with result: String,
+        session: NFCTagReaderSession
+    ) {
         DispatchQueue.main.async {
             self.scannedNFCTag = result
             self.isScanning = false

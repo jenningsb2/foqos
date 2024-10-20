@@ -71,7 +71,7 @@ struct HomeView: View {
             ActionButton(
                 title: isBlocking ? "Scan to stop focus" : "Scan to start focus"
             ) {
-                toggleBlocking()
+                nfcScanner.scan()
             }
         }.padding(.horizontal, 20)
             .familyActivityPicker(isPresented: $isAppListPresent,
@@ -81,7 +81,7 @@ struct HomeView: View {
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             .onChange(of: nfcScanner.scannedNFCTag) { _, newValue in
-                // TODO: call toggle blocking here
+                toggleBlocking()
             }
             .onAppear {
                 loadApp()
