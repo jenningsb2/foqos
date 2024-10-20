@@ -2,7 +2,10 @@ import SwiftUI
 import FamilyControls
 
 struct HomeView: View {
+    let AMZN_STORE_LINK = "https://amzn.to/4fbMuTM"
+    
     @Environment(\.modelContext) private var context
+    @Environment(\.openURL) var openURL
     
     @EnvironmentObject var appBlocker: AppBlocker
     @StateObject private var nfcScanner = NFCScanner()
@@ -46,10 +49,12 @@ struct HomeView: View {
                     ActionCard(
                         icon: "cart.fill",
                         count: nil,
-                        label: "Purschase NFC tags",
+                        label: "Purchase NFC tags",
                         color: .gray
                     ) {
-                        print("Buy tags")
+                        if let url = URL(string: AMZN_STORE_LINK) {
+                            openURL(url)
+                        }
                     }
                 }
                 GridRow {
