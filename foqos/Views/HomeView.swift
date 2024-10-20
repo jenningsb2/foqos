@@ -64,6 +64,8 @@ struct HomeView: View {
                 }
             }
             
+            Text("Sessions")
+            
             List {
                 ForEach(recentCompletedSessions ?? []) { session in
                     InactiveBlockedSessionRow(session: session)
@@ -71,9 +73,9 @@ struct HomeView: View {
                         .listRowInsets(
                             EdgeInsets(
                                 top: 8,
-                                leading: 16,
+                                leading: 0,
                                 bottom: 8,
-                                trailing: 16
+                                trailing: 0
                             )
                         )
                 }
