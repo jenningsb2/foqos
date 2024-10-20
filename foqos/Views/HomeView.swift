@@ -91,7 +91,7 @@ struct HomeView: View {
                 loadApp()
             }
             .onDisappear {
-                stopTimer()
+                unloadApp()
             }
     }
     
@@ -130,6 +130,10 @@ struct HomeView: View {
         recentCompletedSessions = BlockedSession
             .recentInactiveSessions(in: context)
         startTimer()
+    }
+    
+    private func unloadApp() {
+        stopTimer()
     }
     
     private func reloadApp() {
