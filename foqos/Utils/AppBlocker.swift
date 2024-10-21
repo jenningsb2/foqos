@@ -5,12 +5,10 @@ import ManagedSettings
 
 class AppBlocker: ObservableObject {
     @Published var isBlocking = false
+    @Published var isAuthorized = false
     
     let store = ManagedSettingsStore(named: ManagedSettingsStore.Name("foqosAppRestrictions"))
     let center = DeviceActivityCenter()
-    
-    private var isAuthorized = false
-    
     
     func activateRestrictions(selection: FamilyActivitySelection) {
         print("Starting restrictions...")
@@ -47,11 +45,7 @@ class AppBlocker: ObservableObject {
             do {
                 try await AuthorizationCenter.shared.requestAuthorization(for: .individual)
                 print("Individual authorization successful")
-                
-                // If child authorization is also needed:
-                try await AuthorizationCenter.shared.requestAuthorization(for: .child)
-                print("Child authorization successful")
-                
+                                
                 isAuthorized = true
             } catch {
                 print("Error requesting authorization: \(error)")
