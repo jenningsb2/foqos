@@ -55,7 +55,10 @@ class AppBlocker: ObservableObject {
                 try await AuthorizationCenter.shared.requestAuthorization(for: .individual)
                 print("Individual authorization successful")
                                 
-                isAuthorized = true
+                // Dispatch the update to the main thread
+                await MainActor.run {
+                    self.isAuthorized = true
+                }
             } catch {
                 print("Error requesting authorization: \(error)")
             }
