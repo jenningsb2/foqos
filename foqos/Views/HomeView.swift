@@ -61,7 +61,7 @@ struct HomeView: View {
                     ActionCard(
                         icon: "heart.fill",
                         count: nil,
-                        label: "Donate",
+                        label: "Support us",
                         color: .green
                     ) {
                         print("Thanks for the donation")
