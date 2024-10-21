@@ -8,6 +8,7 @@ struct HomeView: View {
     @Environment(\.openURL) var openURL
     
     @EnvironmentObject var appBlocker: AppBlocker
+    @EnvironmentObject var donationManager: TipManager
     @StateObject private var nfcScanner = NFCScanner()
     
     @State private var isAppListPresent = false
@@ -64,7 +65,7 @@ struct HomeView: View {
                         label: "Support us",
                         color: .green
                     ) {
-                        print("Thanks for the donation")
+                        donationManager.tip()
                     }
                 }
             }
