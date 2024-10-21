@@ -15,9 +15,15 @@ class AppBlocker: ObservableObject {
         
         
         let applicationTokens = selection.applicationTokens
+        let categoriesTokens = selection.categoryTokens
+        let webTokens = selection.webDomainTokens
 
+        // Block applications
         let blockedApps = Set(applicationTokens.map { Application(token: $0) })
         store.application.blockedApplications = blockedApps
+        
+        store.shield.applicationCategories = .specific(categoriesTokens)
+        store.shield.webDomains = webTokens
         
         // Set up a DeviceActivitySchedule
         let schedule = DeviceActivitySchedule(
@@ -37,7 +43,10 @@ class AppBlocker: ObservableObject {
     
     func deactivateRestrictions() {
         store.application.blockedApplications = nil
-        center.stopMonitoring([DeviceActivityName("MyActivity")])
+        store.shield.applicationCategories =  nil
+        store.shield.webDomains = nil
+        
+        center.stopMonitoring([DeviceActivityName("foqosDeviceActivity")])
     }
     
     func requestAuthorization() {

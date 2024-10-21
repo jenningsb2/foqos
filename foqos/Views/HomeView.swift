@@ -112,6 +112,7 @@ struct HomeView: View {
         appBlocker.activateRestrictions(selection: activitySelection)
         activeSession = BlockedSession
             .createSession(in: context, withTag: "test")
+        startTimer()
     }
     
     private func stopBlocking() {
@@ -130,7 +131,6 @@ struct HomeView: View {
         activeSession = BlockedSession.mostRecentActiveSession(in: context)
         recentCompletedSessions = BlockedSession
             .recentInactiveSessions(in: context)
-        startTimer()
     }
     
     private func unloadApp() {
