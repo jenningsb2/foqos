@@ -9,7 +9,7 @@ struct HomeView: View {
     
     @EnvironmentObject var appBlocker: AppBlocker
     @EnvironmentObject var donationManager: TipManager
-    @StateObject private var nfcScanner = NFCScanner()
+    @EnvironmentObject var nfcScanner: NFCScanner
     
     @State private var isAppListPresent = false
     @State var activitySelection = FamilyActivitySelection()
@@ -41,7 +41,7 @@ struct HomeView: View {
                 GridRow {
                     ActionCard(
                         icon: "hand.raised.fill",
-                        count: 0,
+                        count: activitySelection.applicationTokens.count,
                         label: "Blocked Apps",
                         color: .red
                     ) {
