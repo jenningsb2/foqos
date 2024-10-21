@@ -4,18 +4,22 @@ struct InactiveBlockedSessionRow: View {
     let session: BlockedSession
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text(session.tag)
-                .font(.headline)
-                .foregroundColor(.primary)
-            
-            HStack {
+        HStack {
+            VStack(alignment: .leading, spacing: 10) {
                 Label(formattedDuration, systemImage: "clock")
-                Spacer()
+                    .font(.headline)
+                    .foregroundColor(.primary)
+                
                 Label(formattedEndTime, systemImage: "calendar")
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
             }
-            .font(.subheadline)
-            .foregroundColor(.secondary)
+            
+            Spacer()
+            
+            Image(systemName: "checkmark.circle.fill")
+                .foregroundColor(.green)
+                .imageScale(.large)
         }
         .padding()
         .background(Color(.secondarySystemBackground))
@@ -25,14 +29,14 @@ struct InactiveBlockedSessionRow: View {
     
     private var formattedDuration: String {
         let formatter = DateComponentsFormatter()
-        formatter.allowedUnits = [.hour, .minute]
+        formatter.allowedUnits = [.hour, .minute, .second]
         formatter.unitsStyle = .abbreviated
         return formatter.string(from: session.duration) ?? ""
     }
     
     private var formattedEndTime: String {
         let formatter = DateFormatter()
-        formatter.dateStyle = .short
+        formatter.dateStyle = .medium
         formatter.timeStyle = .short
         return formatter.string(from: session.endTime ?? Date())
     }
