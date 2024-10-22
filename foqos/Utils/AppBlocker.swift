@@ -18,10 +18,7 @@ class AppBlocker: ObservableObject {
         let categoriesTokens = selection.categoryTokens
         let webTokens = selection.webDomainTokens
 
-        // Block applications
-        let blockedApps = Set(applicationTokens.map { Application(token: $0) })
-        store.application.blockedApplications = blockedApps
-        
+        store.shield.applications = applicationTokens
         store.shield.applicationCategories = .specific(categoriesTokens)
         store.shield.webDomains = webTokens
         
@@ -42,7 +39,7 @@ class AppBlocker: ObservableObject {
     }
     
     func deactivateRestrictions() {
-        store.application.blockedApplications = nil
+        store.shield.applications = nil
         store.shield.applicationCategories =  nil
         store.shield.webDomains = nil
         
