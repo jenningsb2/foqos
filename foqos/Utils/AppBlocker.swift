@@ -13,7 +13,6 @@ class AppBlocker: ObservableObject {
     func activateRestrictions(selection: FamilyActivitySelection) {
         print("Starting restrictions...")
         
-        
         let applicationTokens = selection.applicationTokens
         let categoriesTokens = selection.categoryTokens
         let webTokens = selection.webDomainTokens

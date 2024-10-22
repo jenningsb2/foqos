@@ -11,13 +11,20 @@ struct HomeView: View {
     @EnvironmentObject var donationManager: TipManager
     @EnvironmentObject var nfcScanner: NFCScanner
     
+    // Activity sessions
     @State private var isAppListPresent = false
     @State var activitySelection = FamilyActivitySelection()
     @State var activeSession: BlockedSession?
     @State var recentCompletedSessions: [BlockedSession]?
     
+    // Timers
     @State private var elapsedTime: TimeInterval = 0
     @State private var timer: Timer?
+    
+    // Alerts
+    @State private var showingAlert = false
+    @State private var alertTitle = ""
+    @State private var alertMessage = ""
     
     var isBlocking: Bool {
         return activeSession?.isActive == true
@@ -95,10 +102,16 @@ struct HomeView: View {
             }
             .onDisappear {
                 unloadApp()
+            }.alert(alertTitle, isPresented: $showingAlert) {
+                Button("OK", role: .cancel) { dismissAlert() }
+            } message: {
+                Text(alertMessage)
             }
     }
     
     private func toggleBlocking(results: NFCResult) {
+        print("Toggling block for scanned tag \(results.id) on \(results.DateScanned)")
+        
         let tag = results.id
         if isBlocking {
             stopBlocking(tag: tag)
@@ -121,6 +134,17 @@ struct HomeView: View {
     private func stopBlocking(tag: String) {
         print("Stopping app blocks...")
         
+        guard let session = activeSession else {
+            print("No active session found, calling stop blocking with no session")
+            return
+        }
+        
+        if session.tag != tag {
+            print("session tag: \(session.tag) does not match with tag: \(tag)")
+            showErrorAlert(message: "You must scan the original tag to stop focus")
+            return
+        }
+        
         appBlocker.deactivateRestrictions()
         activeSession?.endSession()
         stopTimer()
@@ -134,6 +158,10 @@ struct HomeView: View {
         activeSession = BlockedSession.mostRecentActiveSession(in: context)
         recentCompletedSessions = BlockedSession
             .recentInactiveSessions(in: context)
+        
+        if activeSession?.isActive == true {
+            startTimer()
+        }
     }
     
     private func unloadApp() {
@@ -174,6 +202,18 @@ struct HomeView: View {
         let minutes = Int(timeInterval) / 60 % 60
         let seconds = Int(timeInterval) % 60
         return String(format: "%02d:%02d:%02d", hours, minutes, seconds)
+    }
+    
+    private func showErrorAlert(message: String) {
+        alertTitle = "Whoops"
+        alertMessage = message
+        showingAlert = true
+    }
+    
+    private func dismissAlert() {
+        showingAlert = false
+        alertTitle = ""
+        alertMessage = ""
     }
 }
 
