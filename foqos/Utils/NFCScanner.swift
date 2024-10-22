@@ -13,7 +13,7 @@ class NFCScanner: NSObject, ObservableObject {
     
     private var nfcSession: NFCReaderSession?
     
-    func scan() {        
+    func scan() {
         guard NFCReaderSession.readingAvailable else {
             self.errorMessage = "NFC scanning not available on this device"
             return
@@ -25,7 +25,7 @@ class NFCScanner: NSObject, ObservableObject {
         )
         nfcSession?.alertMessage = "Hold your iPhone near an NFC tag to change focus."
         nfcSession?.begin()
-
+        
         isScanning = true
     }
 }
