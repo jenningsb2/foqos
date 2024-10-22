@@ -1,8 +1,13 @@
 import SwiftUI
 import CoreNFC
 
+struct NFCResult: Equatable {
+    var id: String
+    var DateScanned: Date
+}
+
 class NFCScanner: NSObject, ObservableObject {
-    @Published var scannedNFCTag: String?
+    @Published var scannedNFCTag: NFCResult?
     @Published var isScanning: Bool = false
     @Published var errorMessage: String?
     
@@ -110,7 +115,7 @@ extension NFCScanner: NFCTagReaderSessionDelegate {
                 return
             }
             
-            let result = "ISO7816 AID: \(data.hexEncodedString()), Status: \(String(format: "%02X %02X", sw1, sw2))"
+            let result = NFCResult(id: data.hexEncodedString(), DateScanned: Date())
             self.completeScanning(with: result, session: session)
         }
     }
@@ -121,7 +126,7 @@ extension NFCScanner: NFCTagReaderSessionDelegate {
     ) {
         // Example: Read FeliCa System Code
         let systemCode = tag.currentSystemCode.hexEncodedString()
-        let result = "FeliCa System Code: \(systemCode)"
+        let result = NFCResult(id: systemCode, DateScanned: Date())
         self.completeScanning(with: result, session: session)
     }
     
@@ -131,7 +136,7 @@ extension NFCScanner: NFCTagReaderSessionDelegate {
     ) {
         // Example: Read ISO15693 UID
         let uid = tag.identifier.hexEncodedString()
-        let result = "ISO15693 UID: \(uid)"
+        let result = NFCResult(id: uid, DateScanned: Date())
         self.completeScanning(with: result, session: session)
     }
     
@@ -141,17 +146,16 @@ extension NFCScanner: NFCTagReaderSessionDelegate {
     ) {
         // Example: Read MIFARE UID
         let uid = tag.identifier.hexEncodedString()
-        let result = "MIFARE UID: \(uid)"
+        let result = NFCResult(id: uid, DateScanned: Date())
         self.completeScanning(with: result, session: session)
     }
     
     private func completeScanning(
-        with result: String,
+        with result: NFCResult,
         session: NFCTagReaderSession
     ) {
         DispatchQueue.main.async {
-            let timeInterval = Date().timeIntervalSince1970
-            self.scannedNFCTag = "\(result). Time Interval: \(timeInterval)"
+            self.scannedNFCTag = result
             self.isScanning = false
             session.invalidate()
         }

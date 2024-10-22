@@ -86,7 +86,9 @@ struct HomeView: View {
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             .onChange(of: nfcScanner.scannedNFCTag) { _, newValue in
-                toggleBlocking()
+                if let nfcResults = newValue {
+                    toggleBlocking(results: nfcResults)
+                }
             }
             .onAppear {
                 loadApp()
@@ -96,26 +98,27 @@ struct HomeView: View {
             }
     }
     
-    private func toggleBlocking() {
+    private func toggleBlocking(results: NFCResult) {
+        let tag = results.id
         if isBlocking {
-            stopBlocking()
+            stopBlocking(tag: tag)
         } else {
-            startBlocking()
+            startBlocking(tag: tag)
         }
         
         reloadApp()
     }
     
-    private func startBlocking() {
+    private func startBlocking(tag: String) {
         print("Starting app blocks...")
         
         appBlocker.activateRestrictions(selection: activitySelection)
         activeSession = BlockedSession
-            .createSession(in: context, withTag: "test")
+            .createSession(in: context, withTag: tag)
         startTimer()
     }
     
-    private func stopBlocking() {
+    private func stopBlocking(tag: String) {
         print("Stopping app blocks...")
         
         appBlocker.deactivateRestrictions()
