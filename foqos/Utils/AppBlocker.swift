@@ -57,6 +57,9 @@ class AppBlocker: ObservableObject {
                 }
             } catch {
                 print("Error requesting authorization: \(error)")
+                await MainActor.run {
+                    self.isAuthorized = false
+                }
             }
         }
     }

@@ -26,6 +26,9 @@ struct HomeView: View {
     @State private var alertTitle = ""
     @State private var alertMessage = ""
     
+    // Intro sheet
+    @AppStorage("showIntroScreen") private var showIntroScreen = true
+    
     var isBlocking: Bool {
         return activeSession?.isActive == true
     }
@@ -97,12 +100,24 @@ struct HomeView: View {
                     toggleBlocking(results: nfcResults)
                 }
             }
+            .onChange(of: appBlocker.isAuthorized) { _, newValue in
+                if newValue {
+                    showIntroScreen = false
+                } else {
+                    showIntroScreen = true
+                }
+            }
             .onAppear {
                 loadApp()
             }
             .onDisappear {
                 unloadApp()
-            }.alert(alertTitle, isPresented: $showingAlert) {
+            }.sheet(isPresented: $showIntroScreen) {
+                IntroView {
+                    appBlocker.requestAuthorization()
+                }.interactiveDismissDisabled()
+            }
+            .alert(alertTitle, isPresented: $showingAlert) {
                 Button("OK", role: .cancel) { dismissAlert() }
             } message: {
                 Text(alertMessage)
