@@ -86,7 +86,7 @@ struct HomeView: View {
                 title: isBlocking ? "Scan to stop focus" : "Scan to start focus",
                 backgroundColor: isBlocking ? Color.red : Color.indigo
             ) {
-                nfcScanner.scan()
+                scanButtonPress()
             }
         }.padding(.horizontal, 20)
             .familyActivityPicker(isPresented: $isAppListPresent,
@@ -122,6 +122,10 @@ struct HomeView: View {
             } message: {
                 Text(alertMessage)
             }
+    }
+    
+    private func scanButtonPress() {
+        nfcScanner.scan()
     }
     
     private func toggleBlocking(results: NFCResult) {
@@ -166,8 +170,6 @@ struct HomeView: View {
     }
     
     private func loadApp() {
-        appBlocker.requestAuthorization()
-        
         activitySelection = BlockedActivitySelection
             .shared(in: context).selectedActivity
         activeSession = BlockedSession.mostRecentActiveSession(in: context)
