@@ -2,6 +2,7 @@ import StoreKit
 
 class TipManager: ObservableObject {
     @Published var products: [Product] = []
+    @Published var purchasedProductIDs = Set<String>()
     
     private let productID = "dev.ambitionsoftware.2dollartip"
     
@@ -60,8 +61,10 @@ class TipManager: ObservableObject {
         case .success(let verificationResult):
             switch verificationResult {
             case .verified(let transaction):
-                // Handle successful purchase
-                print("Purchase success: \(transaction.id)")
+                DispatchQueue.main.async {
+                    self.purchasedProductIDs.insert(product.id)
+                    print("Purchase success: \(transaction.id)")
+                }
                 await transaction.finish()
             case .unverified(_, let error):
                 print("Purchase unverified: \(error)")
