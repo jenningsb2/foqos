@@ -5,7 +5,7 @@ class TipManager: ObservableObject {
     @Published var purchasedProductIDs = Set<String>()
     @Published var purchaseError: String?
     
-    private let productID = "dev.ambitionsoftware.2dollartip"
+    private let productID = "tip_developer_support"
     
     init() {
         Task {

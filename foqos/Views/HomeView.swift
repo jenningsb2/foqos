@@ -25,7 +25,7 @@ struct HomeView: View {
     @State private var showingAlert = false
     @State private var alertTitle = ""
     @State private var alertMessage = ""
-        
+    
     // Intro sheet
     @AppStorage("showIntroScreen") private var showIntroScreen = true
     
@@ -106,9 +106,6 @@ struct HomeView: View {
                 } else {
                     showIntroScreen = true
                 }
-            }
-            .onChange(of: donationManager.purchasedProductIDs) { _, newValue in
-                showAlert(title: "Thank you", message: "Thank you for the support, we really appreciate it!")
             }
             .onAppear {
                 loadApp()

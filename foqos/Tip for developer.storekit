@@ -17,7 +17,7 @@
     {
       "displayPrice" : "1.99",
       "familyShareable" : false,
-      "internalID" : "1C13B146",
+      "internalID" : "7808C96D",
       "localizations" : [
         {
           "description" : "",
@@ -25,9 +25,9 @@
           "locale" : "en_US"
         }
       ],
-      "productID" : "dev.ambitionsoftware.2dollartip",
-      "referenceName" : "Tip for developer",
-      "type" : "Consumable"
+      "productID" : "developer_tip",
+      "referenceName" : "Tip for developer ",
+      "type" : "NonConsumable"
     }
   ],
   "settings" : {
