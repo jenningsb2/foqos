@@ -3,11 +3,11 @@ import StoreKit
 class TipManager: ObservableObject {
     @Published var products: [Product] = []
     @Published var purchasedProductIDs = Set<String>()
+    @Published var purchaseError: String?
     
     private let productID = "dev.ambitionsoftware.2dollartip"
     
     init() {
-        // Start listening for transactions immediately
         Task {
             await loadProducts()
             await setupTransactionListener()
@@ -16,75 +16,113 @@ class TipManager: ObservableObject {
     
     @MainActor
     private func setupTransactionListener() async {
-        // Handle any pending transactions from previous purchases
-        for await result in Transaction.updates {
+        // Start a transaction listener as soon as the app launches
+        let updates = Transaction.updates
+        for await result in updates {
             do {
                 switch result {
                 case .verified(let transaction):
-                    // Handle successful purchase
-                    print("Verified transaction: \(transaction.id)")
-                    await transaction.finish()
-                case .unverified( _, let error):
-                    // Handle unverified transaction
-                    print("Unverified transaction: \(error)")
+                    // Handle a verified transaction
+                    await handleVerifiedTransaction(transaction)
+                case .unverified(let transaction, let error):
+                    // Log the unverified transaction for debugging
+                    purchaseError = "Verification failed: \(error.localizedDescription)"
+                    print("Unverified transaction: \(transaction.id), Error: \(error)")
                 }
             }
         }
     }
     
     @MainActor
+    private func handleVerifiedTransaction(_ transaction: Transaction) async {
+        // Add the purchased product identifier to the purchased set
+        purchasedProductIDs.insert(transaction.productID)
+        
+        // Always finish a transaction once you've delivered the content
+        await transaction.finish()
+        
+        // Update any UI or app state based on the purchase
+        NotificationCenter.default.post(name: NSNotification.Name("PurchaseSuccessful"), object: nil)
+    }
+    
+    @MainActor
     func loadProducts() async {
         do {
-            let products = try await Product.products(for: [productID])
-            self.products = products
+            // Request products from the App Store
+            products = try await Product.products(for: [productID])
             
-            // Debug info
-            if products.isEmpty {
-                print("No products found for ID: \(productID)")
-            } else {
-                print("Found products: \(products.map { $0.id })")
-            }
+            // Check current entitlements
+            await checkEntitlements()
+            
+            // Debug logging
+            print("Available products: \(products.map { $0.id }.joined(separator: ", "))")
         } catch {
-            print("Failed to load products: \(error)")
+            purchaseError = "Failed to load products: \(error.localizedDescription)"
+            print("Product loading error: \(error)")
+        }
+    }
+    
+    @MainActor
+    private func checkEntitlements() async {
+        // Verify existing purchases
+        for await result in Transaction.currentEntitlements {
+            switch result {
+            case .verified(let transaction):
+                purchasedProductIDs.insert(transaction.productID)
+            case .unverified:
+                continue
+            }
         }
     }
     
     func purchase() async throws {
         guard let product = products.first else {
-            print("No products available")
-            return
+            throw StoreError.noProduct
         }
         
+        // Begin a purchase
         let result = try await product.purchase()
         
-        switch result {
-        case .success(let verificationResult):
-            switch verificationResult {
-            case .verified(let transaction):
-                DispatchQueue.main.async {
-                    self.purchasedProductIDs.insert(product.id)
-                    print("Purchase success: \(transaction.id)")
+        await MainActor.run {
+            switch result {
+            case .success(let verificationResult):
+                switch verificationResult {
+                case .verified(let transaction):
+                    // Handle successful purchase
+                    purchasedProductIDs.insert(transaction.productID)
+                    Task {
+                        await transaction.finish()
+                    }
+                case .unverified(_, let error):
+                    purchaseError = "Purchase verification failed: \(error.localizedDescription)"
                 }
-                await transaction.finish()
-            case .unverified(_, let error):
-                print("Purchase unverified: \(error)")
+            case .userCancelled:
+                purchaseError = "Purchase was cancelled"
+            case .pending:
+                purchaseError = "Purchase is pending"
+            @unknown default:
+                purchaseError = "Unknown purchase result"
             }
-        case .userCancelled:
-            print("User cancelled")
-        case .pending:
-            print("Transaction pending")
-        @unknown default:
-            print("Unknown result")
         }
     }
     
     func tip() {
         Task {
             do {
-                try await self.purchase()
+                try await purchase()
+            } catch StoreError.noProduct {
+                await MainActor.run {
+                    purchaseError = "No product available for purchase"
+                }
             } catch {
-                print("Failed to purchase: \(error)")
+                await MainActor.run {
+                    purchaseError = "Purchase failed: \(error.localizedDescription)"
+                }
             }
         }
     }
+}
+
+enum StoreError: Error {
+    case noProduct
 }
