@@ -5,15 +5,15 @@
 //  Created by Ali Waseem on 2024-10-06.
 //
 
-import SwiftUI
 import SwiftData
+import SwiftUI
 
 @main
 struct foqosApp: App {
     @StateObject private var appBlocker = AppBlocker()
     @StateObject private var donationManager = TipManager()
     @StateObject private var nfcScanner = NFCScanner()
-    
+
     var body: some Scene {
         WindowGroup {
             HomeView()
@@ -24,14 +24,20 @@ struct foqosApp: App {
                     handleUniversalLink(url)
                 }
         }
-        .modelContainer(for: [BlockedActivitySelection.self, BlockedSession.self])
+        .modelContainer(
+            for: [
+                BlockedActivitySelection.self,
+                BlockedSession.self,
+                BlockedProfiles.self,
+            ]
+        )
     }
-    
+
     private func handleUniversalLink(_ url: URL) {
         // Parse and handle the URL
         let components = URLComponents(url: url, resolvingAgainstBaseURL: true)
         guard let path = components?.path else { return }
-        
+
         // Use your app's navigation state to navigate
         // Example using @StateObject:
         switch path {
