@@ -2,6 +2,7 @@
 import Foundation
 import SwiftData
 import FamilyControls
+import ManagedSettings
 
 @Model
 class BlockedProfiles {
@@ -56,5 +57,9 @@ class BlockedProfiles {
     static func deleteProfile(_ profile: BlockedProfiles, in context: ModelContext) throws {
         context.delete(profile)
         try context.save()
+    }
+    
+    static func countSelectedActivities(_ selection: FamilyActivitySelection) -> Int {
+        return selection.categories.count + selection.applications.count
     }
 }

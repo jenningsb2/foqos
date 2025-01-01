@@ -10,7 +10,6 @@ struct ProfileRow: View {
                 .font(.headline)
         }
         .padding(.vertical, 4)
-        .contentShape(Rectangle())
     }
 }
 

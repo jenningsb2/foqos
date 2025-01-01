@@ -11,6 +11,7 @@ struct BlockedProfileView: View {
     
     @State private var name: String = ""
     @State private var selectedActivity = FamilyActivitySelection()
+    @State private var catAndAppCount: Int = 0
     @State private var showingActivityPicker = false
     @State private var errorMessage: String?
     @State private var showError = false
@@ -23,6 +24,10 @@ struct BlockedProfileView: View {
         self.profile = profile
         _name = State(initialValue: profile?.name ?? "")
         _selectedActivity = State(initialValue: profile?.selectedActivity ?? FamilyActivitySelection())
+        _catAndAppCount = State(
+            initialValue: BlockedProfiles
+                .countSelectedActivities(selectedActivity)
+        )
     }
     
     var body: some View {
@@ -31,7 +36,9 @@ struct BlockedProfileView: View {
                 Section("Profile Details") {
                     TextField("Profile Name", text: $name)
                         .textInputAutocapitalization(.words)
-                    
+                }
+                
+                Section("Selected Restrictions") {
                     Button(action: {
                         showingActivityPicker = true
                     }) {
@@ -42,12 +49,20 @@ struct BlockedProfileView: View {
                                 .foregroundStyle(.gray)
                         }
                     }
+                    if catAndAppCount == 0 {
+                        Text("No apps or websites selected")
+                            .foregroundStyle(.gray)
+                    } else {
+                        Text("\(catAndAppCount) items selected")
+                            .font(.footnote)
+                            .foregroundStyle(.gray)
+                            .padding(.top, 4)
+                    }
                 }
-                
-                Section("Selected Restrictions") {
-                    Text("Apps & Websites selected")
-                        .foregroundStyle(.gray)
-                }
+            }
+            .onChange(of: selectedActivity) { _, newValue in
+                catAndAppCount = BlockedProfiles
+                    .countSelectedActivities(newValue)
             }
             .navigationTitle(isEditing ? "Edit Profile" : "New Profile")
             .navigationBarTitleDisplayMode(.inline)
