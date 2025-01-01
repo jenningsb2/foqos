@@ -20,7 +20,29 @@ struct foqosApp: App {
                 .environmentObject(appBlocker)
                 .environmentObject(donationManager)
                 .environmentObject(nfcScanner)
+                .onOpenURL { url in
+                    handleUniversalLink(url)
+                }
         }
         .modelContainer(for: [BlockedActivitySelection.self, BlockedSession.self])
+    }
+    
+    private func handleUniversalLink(_ url: URL) {
+        // Parse and handle the URL
+        let components = URLComponents(url: url, resolvingAgainstBaseURL: true)
+        guard let path = components?.path else { return }
+        
+        // Use your app's navigation state to navigate
+        // Example using @StateObject:
+        switch path {
+        case "/products":
+            // Navigate to products
+            break
+        case "/profile":
+            // Navigate to profile
+            break
+        default:
+            break
+        }
     }
 }
