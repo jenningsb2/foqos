@@ -133,6 +133,5 @@ struct BlockedSessionsChart: View {
                     }
             )
         }
-        .padding(.vertical)
     }
 }

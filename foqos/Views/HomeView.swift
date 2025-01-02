@@ -109,13 +109,10 @@ struct HomeView: View {
                 }
             }
 
-            ActionButton(
-                title: isBlocking
-                    ? "Scan to stop focus" : "Scan to start focus",
-                backgroundColor: isBlocking ? Color.red : Color.indigo
-            ) {
-                scanButtonPress()
-            }
+            Spacer()
+            
+            VersionFooter()
+                .frame(maxWidth: .infinity)
         }.padding(.top, 10)
             .padding(.horizontal, 20)
             .sheet(isPresented: $isProfileListPresent) {

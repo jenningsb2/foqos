@@ -10,8 +10,9 @@ struct SectionTitle: View {
     var body: some View {
         Text(title)
             .font(.headline)
-            .fontWeight(.regular)
+            .fontWeight(.medium)
             .foregroundColor(.secondary)
+            .padding(.bottom, 10)
     }
 }
 
