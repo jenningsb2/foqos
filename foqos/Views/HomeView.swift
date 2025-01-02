@@ -1,4 +1,5 @@
 import FamilyControls
+import SwiftData
 import SwiftUI
 
 struct HomeView: View {
@@ -12,6 +13,8 @@ struct HomeView: View {
     @EnvironmentObject var nfcScanner: NFCScanner
 
     // Profile management
+    @Query(sort: \BlockedProfiles.updatedAt, order: .reverse) private
+        var profiles: [BlockedProfiles]
     @State private var isProfileListPresent = false
 
     // Activity sessions
@@ -38,6 +41,25 @@ struct HomeView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
+            if let mostRecent = profiles.first {
+                VStack(alignment: .leading, spacing: 5) {
+                    Text("Selected profile")
+                        .font(.headline)
+                        .fontWeight(.regular)
+                        .foregroundColor(.secondary)
+                    
+                    BlockedProfileSelector(
+                        profile: mostRecent,
+                        onSwipeLeft: {
+                            print("swiped left")
+                        },
+                        onSwipeRight: {
+                            print("swiped right")
+                        }
+                    )
+                }
+            }
+
             VStack(alignment: .leading, spacing: 5) {
                 Text("Time in Focus")
                     .font(.headline)
@@ -48,17 +70,17 @@ struct HomeView: View {
                     .font(.system(size: 80))
                     .fontWeight(.semibold)
                     .foregroundColor(.primary)
-            }.padding(.top, 20)
+            }
 
             Grid(horizontalSpacing: 10, verticalSpacing: 16) {
                 GridRow {
                     ActionCard(
-                        icon: "hand.raised.fill",
-                        count: activitySelection.applicationTokens.count,
-                        label: "Blocked Apps",
-                        color: .red
+                        icon: "person.crop.circle.fill",
+                        count: nil,
+                        label: "Profiles",
+                        color: .purple
                     ) {
-                        isAppListPresent = true
+                        isProfileListPresent = true
                     }
                     ActionCard(
                         icon: "cart.fill",
@@ -79,14 +101,6 @@ struct HomeView: View {
                         color: .green
                     ) {
                         donationManager.tip()
-                    }
-                    ActionCard(
-                        icon: "person.crop.circle.fill",
-                        count: nil,
-                        label: "Profiles",
-                        color: .purple
-                    ) {
-                        isProfileListPresent = true
                     }
                 }
             }

@@ -38,6 +38,13 @@ class BlockedProfiles {
         return try context.fetch(descriptor).first
     }
     
+    static func fetchMostRecentlyUpdatedProfile(in context: ModelContext) throws -> BlockedProfiles? {
+        let descriptor = FetchDescriptor<BlockedProfiles>(
+            sortBy: [SortDescriptor(\.updatedAt, order: .reverse)]
+        )
+        return try context.fetch(descriptor).first
+    }
+    
     static func updateProfile(_ profile: BlockedProfiles,
                             in context: ModelContext,
                             name: String? = nil,
