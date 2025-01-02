@@ -17,12 +17,12 @@ struct foqosApp: App {
     var body: some Scene {
         WindowGroup {
             HomeView()
+                .onOpenURL() { url in
+                    handleUniversalLink(url)
+                }
                 .environmentObject(appBlocker)
                 .environmentObject(donationManager)
                 .environmentObject(nfcScanner)
-                .onOpenURL { url in
-                    handleUniversalLink(url)
-                }
         }
         .modelContainer(
             for: [
@@ -31,14 +31,18 @@ struct foqosApp: App {
             ]
         )
     }
-
+    
+    
     private func handleUniversalLink(_ url: URL) {
+        print("Universal link received:", url.absoluteString) // Add this
+        
         // Parse and handle the URL
         let components = URLComponents(url: url, resolvingAgainstBaseURL: true)
         guard let path = components?.path else { return }
 
         // Use your app's navigation state to navigate
         // Example using @StateObject:
+        print("Path:", path) // Add this
         switch path {
         case "/products":
             // Navigate to products

@@ -142,6 +142,7 @@ struct HomeView: View {
             }
             .onChange(of: nfcScanner.scannedNFCTag) { _, newValue in
                 if let nfcResults = newValue {
+                    let dataStr = String(decoding: nfcResults.data, as: UTF8.self)
                     toggleBlocking(results: nfcResults)
                 }
             }

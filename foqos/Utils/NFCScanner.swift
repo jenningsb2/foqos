@@ -3,6 +3,7 @@ import CoreNFC
 
 struct NFCResult: Equatable {
     var id: String
+    let data: Data
     var DateScanned: Date
 }
 
@@ -59,124 +60,83 @@ class NFCScanner: NSObject, ObservableObject {
 // Existing NFCTagReaderSessionDelegate
 extension NFCScanner: NFCTagReaderSessionDelegate {
     func tagReaderSessionDidBecomeActive(_ session: NFCTagReaderSession) {
-        // This method is called when the session begins.
-        return
+        // Session started
     }
     
-    func tagReaderSession(
-        _ session: NFCTagReaderSession,
-        didInvalidateWithError error: Error
-    ) {
+    func tagReaderSession(_ session: NFCTagReaderSession, didInvalidateWithError error: Error) {
         DispatchQueue.main.async {
             self.isScanning = false
             self.errorMessage = error.localizedDescription
         }
     }
     
-    func tagReaderSession(
-        _ session: NFCTagReaderSession,
-        didDetect tags: [NFCTag]
-    ) {
-        if tags.count > 1 {
-            session.alertMessage = "More than 1 tag detected. Please present only 1 tag."
-            return
-        }
-        
-        guard let tag = tags.first else {
-            return
-        }
+    func tagReaderSession(_ session: NFCTagReaderSession, didDetect tags: [NFCTag]) {
+        guard let tag = tags.first else { return }
         
         session.connect(to: tag) { error in
             if let error = error {
-                session
-                    .invalidate(
-                        errorMessage: "Connection error: \(error.localizedDescription)"
-                    )
+                session.invalidate(errorMessage: "Connection error: \(error.localizedDescription)")
                 return
             }
             
             switch tag {
-            case .iso7816(let iso7816Tag):
-                self.handleISO7816Tag(iso7816Tag, session: session)
-            case .feliCa(let feliCaTag):
-                self.handleFeliCaTag(feliCaTag, session: session)
-            case .iso15693(let iso15693Tag):
-                self.handleISO15693Tag(iso15693Tag, session: session)
-            case .miFare(let miFareTag):
-                self.handleMiFareTag(miFareTag, session: session)
-            @unknown default:
+            case .iso15693(let tag):
+                self.readISO15693Tag(tag, session: session)
+            case .miFare(let tag):
+                self.readMiFareTag(tag, session: session)
+            default:
                 session.invalidate(errorMessage: "Unsupported tag type")
             }
         }
     }
     
-    // Existing handler methods remain unchanged...
-    private func handleISO7816Tag(
-        _ tag: NFCISO7816Tag,
-        session: NFCTagReaderSession
-    ) {
-        // Example: Read AID (Application Identifier)
-        let apdu = NFCISO7816APDU(
-            instructionClass: 0x00,
-            instructionCode: 0xA4,
-            p1Parameter: 0x04,
-            p2Parameter: 0x00,
-            data: Data(),
-            expectedResponseLength: -1
-        )
+    private func readMiFareTag(_ tag: NFCMiFareTag, session: NFCTagReaderSession) {
+        let id = tag.identifier.hexEncodedString()
+        var tagData = Data()
         
-        tag.sendCommand(apdu: apdu) {
-            data,
-            sw1,
-            sw2,
-            error in
-            if let error = error {
-                session
-                    .invalidate(
-                        errorMessage: "Error reading ISO7816 tag: \(error.localizedDescription)"
-                    )
+        // Read 12 pages starting from page 4
+        func readPage(_ index: Int) {
+            guard index < 16 else {
+                handleTagData(id: id, data: tagData, session: session)
                 return
             }
             
-            let result = NFCResult(id: data.hexEncodedString(), DateScanned: Date())
-            self.completeScanning(with: result, session: session)
+            let command = Data([0x30, UInt8(index)])
+            tag.sendMiFareCommand(commandPacket: command) { result in
+                switch result {
+                case .success(let data):
+                    tagData.append(data)
+                    readPage(index + 1)
+                case .failure:
+                    self.handleTagData(id: id, data: tagData, session: session)
+                }
+            }
+        }
+        
+        readPage(4)
+    }
+    
+    private func readISO15693Tag(_ tag: NFCISO15693Tag, session: NFCTagReaderSession) {
+        let id = tag.identifier.hexEncodedString()
+        
+        tag.readMultipleBlocks(requestFlags: [.address, .highDataRate], blockRange: NSRange(location: 0, length: 4)) { result in
+            switch result {
+            case .success(let blocks):
+                let data = blocks.reduce(Data(), { $0 + $1 })
+                self.handleTagData(id: id, data: data, session: session)
+            case .failure:
+                self.handleTagData(id: id, data: Data(), session: session)
+            }
         }
     }
     
-    private func handleFeliCaTag(
-        _ tag: NFCFeliCaTag,
-        session: NFCTagReaderSession
-    ) {
-        // Example: Read FeliCa System Code
-        let systemCode = tag.currentSystemCode.hexEncodedString()
-        let result = NFCResult(id: systemCode, DateScanned: Date())
-        self.completeScanning(with: result, session: session)
-    }
-    
-    private func handleISO15693Tag(
-        _ tag: NFCISO15693Tag,
-        session: NFCTagReaderSession
-    ) {
-        // Example: Read ISO15693 UID
-        let uid = tag.identifier.hexEncodedString()
-        let result = NFCResult(id: uid, DateScanned: Date())
-        self.completeScanning(with: result, session: session)
-    }
-    
-    private func handleMiFareTag(
-        _ tag: NFCMiFareTag,
-        session: NFCTagReaderSession
-    ) {
-        // Example: Read MIFARE UID
-        let uid = tag.identifier.hexEncodedString()
-        let result = NFCResult(id: uid, DateScanned: Date())
-        self.completeScanning(with: result, session: session)
-    }
-    
-    private func completeScanning(
-        with result: NFCResult,
-        session: NFCTagReaderSession
-    ) {
+    private func handleTagData(id: String, data: Data, session: NFCTagReaderSession) {        
+        let result = NFCResult(
+            id: id,
+            data: data,
+            DateScanned: Date()
+        )
+        
         DispatchQueue.main.async {
             self.scannedNFCTag = result
             self.isScanning = false
@@ -202,7 +162,7 @@ extension NFCScanner: NFCNDEFReaderSessionDelegate {
                 session.invalidate(errorMessage: "Connection error: \(error.localizedDescription)")
                 return
             }
-            
+                        
             tag.queryNDEFStatus { status, capacity, error in
                 guard error == nil else {
                     session.invalidate(errorMessage: "Failed to query tag")

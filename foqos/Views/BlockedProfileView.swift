@@ -65,7 +65,7 @@ struct BlockedProfileView: View {
                     }
                 }
                 
-                if isEditing || !name.isEmpty {
+                if isEditing {
                     Section("Utilities") {
                         Button(action: {
                             writeProfile()
