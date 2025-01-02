@@ -42,11 +42,8 @@ struct HomeView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
             VStack(alignment: .leading, spacing: 10) {
-                Text("Time in Focus")
-                    .font(.headline)
-                    .fontWeight(.regular)
-                    .foregroundColor(.secondary)
-
+                SectionTitle("Time in Focus")
+                
                 Text(timeString(from: elapsedTime))
                     .font(.system(size: 80))
                     .fontWeight(.semibold)
@@ -54,20 +51,14 @@ struct HomeView: View {
             }
             
             VStack(alignment: .leading, spacing: 10) {
-                Text("Weekly Usage")
-                    .font(.headline)
-                    .fontWeight(.regular)
-                    .foregroundColor(.secondary)
+                SectionTitle("Weekly Usage")
                 
                 BlockedSessionsChart(sessions: recentCompletedSessions ?? [])
             }
 
             if let mostRecent = activeProfile {
                 VStack(alignment: .leading, spacing: 10) {
-                    Text("Active Profile")
-                        .font(.headline)
-                        .fontWeight(.regular)
-                        .foregroundColor(.secondary)
+                    SectionTitle("Active Profile")
 
                     BlockedProfileSelector(
                         profile: mostRecent,
@@ -82,10 +73,7 @@ struct HomeView: View {
             }
 
             VStack(alignment: .leading, spacing: 10) {
-                Text("Manage")
-                    .font(.headline)
-                    .fontWeight(.regular)
-                    .foregroundColor(.secondary)
+                SectionTitle("Manage")
 
                 Grid(horizontalSpacing: 10, verticalSpacing: 16) {
                     GridRow {
