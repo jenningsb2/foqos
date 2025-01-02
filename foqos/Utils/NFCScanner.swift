@@ -190,22 +190,7 @@ extension NFCScanner: NFCNDEFReaderSessionDelegate {
                 case .readOnly:
                     session.invalidate(errorMessage: "Tag is read-only")
                 case .readWrite:
-                    guard let urlString = self.urlToWrite,
-                          let url = URL(string: urlString),
-                          let urlPayload = NFCNDEFPayload.wellKnownTypeURIPayload(url: url) else {
-                        session.invalidate(errorMessage: "Invalid URL")
-                        return
-                    }
-                    
-                    let message = NFCNDEFMessage(records: [urlPayload])
-                    tag.writeNDEF(message) { error in
-                        if let error = error {
-                            session.invalidate(errorMessage: "Write failed: \(error.localizedDescription)")
-                        } else {
-                            session.alertMessage = "Successfully wrote URL to tag"
-                            session.invalidate()
-                        }
-                    }
+                    self.handleReadWrite(session, tag: tag)
                 @unknown default:
                     session.invalidate(errorMessage: "Unknown tag status")
                 }
@@ -229,6 +214,25 @@ extension NFCScanner: NFCNDEFReaderSessionDelegate {
                 default:
                     self.errorMessage = error.localizedDescription
                 }
+            }
+        }
+    }
+    
+    private func handleReadWrite(_ session: NFCNDEFReaderSession, tag: NFCNDEFTag) {
+        guard let urlString = self.urlToWrite,
+              let url = URL(string: urlString),
+              let urlPayload = NFCNDEFPayload.wellKnownTypeURIPayload(url: url) else {
+            session.invalidate(errorMessage: "Invalid URL")
+            return
+        }
+        
+        let message = NFCNDEFMessage(records: [urlPayload])
+        tag.writeNDEF(message) { error in
+            if let error = error {
+                session.invalidate(errorMessage: "Write failed: \(error.localizedDescription)")
+            } else {
+                session.alertMessage = "Successfully wrote URL to tag"
+                session.invalidate()
             }
         }
     }
