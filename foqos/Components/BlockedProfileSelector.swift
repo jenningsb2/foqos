@@ -26,8 +26,12 @@ struct BlockedProfileSelector: View {
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding()
-        .background(Color(.systemBackground))
-        .cornerRadius(12)
+        .background(Color(.secondarySystemBackground))
+        .cornerRadius(10)
+        .overlay(
+            RoundedRectangle(cornerRadius: 10)
+                .stroke(Color.gray.opacity(0.2), lineWidth: 0)
+        )
         .shadow(radius: 2)
         .offset(x: offset)
         .opacity(cardOpacity)

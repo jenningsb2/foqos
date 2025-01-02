@@ -13,8 +13,8 @@ struct HomeView: View {
     @EnvironmentObject var nfcScanner: NFCScanner
 
     // Profile management
-    @Query(sort: \BlockedProfiles.updatedAt, order: .reverse) private
-        var profiles: [BlockedProfiles]
+    @Query(sort: \BlockedProfiles.updatedAt, order: .reverse) private var profiles: [BlockedProfiles]
+    @State private var profileIndex = 0
     @State private var isProfileListPresent = false
 
     // Activity sessions
@@ -41,9 +41,9 @@ struct HomeView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
-            if let mostRecent = profiles.first {
+            if let mostRecent = profiles[safe: profileIndex] {
                 VStack(alignment: .leading, spacing: 5) {
-                    Text("Selected profile")
+                    Text("Active profile")
                         .font(.headline)
                         .fontWeight(.regular)
                         .foregroundColor(.secondary)
@@ -51,10 +51,10 @@ struct HomeView: View {
                     BlockedProfileSelector(
                         profile: mostRecent,
                         onSwipeLeft: {
-                            print("swiped left")
+                            incrementProfiles()
                         },
                         onSwipeRight: {
-                            print("swiped right")
+                            decrementProfiles()
                         }
                     )
                 }
@@ -153,6 +153,18 @@ struct HomeView: View {
             } message: {
                 Text(alertMessage)
             }
+    }
+    
+    private func incrementProfiles() {
+        guard !profiles.isEmpty else { return }
+        
+        profileIndex = (profileIndex + 1) % profiles.count
+    }
+
+    private func decrementProfiles() {
+        guard !profiles.isEmpty else { return }
+        
+        profileIndex = (profileIndex - 1 + profiles.count) % profiles.count
     }
 
     private func scanButtonPress() {

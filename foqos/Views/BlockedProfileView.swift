@@ -64,7 +64,7 @@ struct BlockedProfileView: View {
                 catAndAppCount = BlockedProfiles
                     .countSelectedActivities(newValue)
             }
-            .navigationTitle(isEditing ? "Edit Profile" : "New Profile")
+            .navigationTitle(isEditing ? "Profile Details" : "New Profile")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
