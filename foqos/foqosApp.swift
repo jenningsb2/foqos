@@ -26,7 +26,6 @@ struct foqosApp: App {
         }
         .modelContainer(
             for: [
-                BlockedActivitySelection.self,
                 BlockedProfileSession.self,
                 BlockedProfiles.self,
             ]
