@@ -18,6 +18,7 @@ struct HomeView: View {
     @State private var activeProfile: BlockedProfiles? = nil
     @State private var profileIndex = 0
     @State private var isProfileListPresent = false
+    @State private var showActiveProfileView = false
 
     // Activity sessions
     @State var activeSession: BlockedProfileSession?
@@ -69,6 +70,12 @@ struct HomeView: View {
                             },
                             onSwipeRight: {
                                 decrementProfiles()
+                            },
+                            onTap: {
+                                showActiveProfileView = true
+                            },
+                            onLongPress: {
+                                scanButtonPress()
                             }
                         )
                     }
@@ -150,6 +157,8 @@ struct HomeView: View {
             IntroView {
                 appBlocker.requestAuthorization()
             }.interactiveDismissDisabled()
+        }.sheet(isPresented: $showActiveProfileView) {
+            BlockedProfileView(profile: activeProfile)
         }
         .alert(alertTitle, isPresented: $showingAlert) {
             Button("OK", role: .cancel) { dismissAlert() }
