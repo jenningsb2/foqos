@@ -117,7 +117,7 @@ struct HomeView: View {
                     .frame(maxWidth: .infinity)
             }
         }
-        .padding(.top, 10)
+        .padding(.top, 1)
         .padding(.horizontal, 20)
         .sheet(isPresented: $isProfileListPresent) {
             BlockedProfileListView()
