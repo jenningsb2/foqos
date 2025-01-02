@@ -11,7 +11,7 @@ struct BlockedProfileSelector: View {
     @State private var isLongPressing = false
     @State private var isDragging = false
     
-    private let swipeThreshold: CGFloat = 60  // Reduced from 75
+    private let swipeThreshold: CGFloat = 60
     
     private var cardOpacity: Double {
         let progress = abs(offset) / swipeThreshold
@@ -23,14 +23,31 @@ struct BlockedProfileSelector: View {
     }
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            Text(profile.name)
-                .font(.headline)
-            Text("\(BlockedProfiles.countSelectedActivities(profile.selectedActivity)) items blocked")
-                .font(.subheadline)
-                .foregroundColor(.secondary)
+        HStack(alignment: .center, spacing: 12) {
+            // Main Content
+            VStack(alignment: .leading, spacing: 4) {
+                Text(profile.name)
+                    .font(.headline)
+                Text("\(BlockedProfiles.countSelectedActivities(profile.selectedActivity)) items blocked")
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            
+            // Gesture Hints
+            HStack(alignment: .center, spacing: 8) {
+                Image(systemName: "hand.tap.fill")
+                    .font(.caption)
+                Image(systemName: "chevron.left")
+                    .font(.caption)
+                Image(systemName: "chevron.right")
+                    .font(.caption)
+            }
+            .foregroundColor(.secondary)
+            .opacity(0.4)
+            .frame(width: 20)
+            .padding(.horizontal)
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
         .padding()
         .background(backgroundColor)
         .cornerRadius(10)
@@ -42,7 +59,7 @@ struct BlockedProfileSelector: View {
                 onLongPress()
             }
         } onPressingChanged: { isPressing in
-            if !isDragging {  // Only allow color change if not dragging
+            if !isDragging {
                 withAnimation(.spring(response: 0.4, dampingFraction: 0.6)) {
                     isLongPressing = isPressing
                 }
@@ -52,7 +69,7 @@ struct BlockedProfileSelector: View {
             DragGesture()
                 .onChanged { value in
                     isDragging = true
-                    isLongPressing = false  // Reset long press state when dragging
+                    isLongPressing = false
                     withAnimation(.interactiveSpring(response: 0.3, dampingFraction: 0.7)) {
                         offset = value.translation.width
                     }
