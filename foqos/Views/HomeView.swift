@@ -52,6 +52,15 @@ struct HomeView: View {
                     .fontWeight(.semibold)
                     .foregroundColor(.primary)
             }
+            
+            VStack(alignment: .leading, spacing: 10) {
+                Text("Weekly Usage")
+                    .font(.headline)
+                    .fontWeight(.regular)
+                    .foregroundColor(.secondary)
+                
+                BlockedSessionsChart(sessions: recentCompletedSessions ?? [])
+            }
 
             if let mostRecent = activeProfile {
                 VStack(alignment: .leading, spacing: 10) {
