@@ -12,6 +12,8 @@ class BlockedProfiles {
     var createdAt: Date
     var updatedAt: Date
     
+    @Relationship(deleteRule: .cascade) var sessions: [BlockedProfileSession] = []
+    
     init(id: UUID = UUID(),
          name: String,
          selectedActivity: FamilyActivitySelection = FamilyActivitySelection(),

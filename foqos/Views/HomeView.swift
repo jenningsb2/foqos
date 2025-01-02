@@ -15,14 +15,13 @@ struct HomeView: View {
     // Profile management
     @Query(sort: \BlockedProfiles.updatedAt, order: .reverse) private
         var profiles: [BlockedProfiles]
+    @State private var activeProfile: BlockedProfiles? = nil
     @State private var profileIndex = 0
     @State private var isProfileListPresent = false
 
     // Activity sessions
-    @State private var isAppListPresent = false
-    @State var activitySelection = FamilyActivitySelection()
-    @State var activeSession: BlockedSession?
-    @State var recentCompletedSessions: [BlockedSession]?
+    @State var activeSession: BlockedProfileSession?
+    @State var recentCompletedSessions: [BlockedProfileSession]?
 
     // Timers
     @State private var elapsedTime: TimeInterval = 0
@@ -54,7 +53,7 @@ struct HomeView: View {
                     .foregroundColor(.primary)
             }
 
-            if let mostRecent = profiles[safe: profileIndex] {
+            if let mostRecent = activeProfile {
                 VStack(alignment: .leading, spacing: 10) {
                     Text("Active profile")
                         .font(.headline)
@@ -125,17 +124,13 @@ struct HomeView: View {
             .sheet(isPresented: $isProfileListPresent) {
                 BlockedProfileListView()
             }
-            .familyActivityPicker(
-                isPresented: $isAppListPresent,
-                selection: $activitySelection
-            )
-            .onChange(of: activitySelection) { _, newSelection in
-                updateBlockedActivitySelection(newValue: activitySelection)
-            }
             .frame(
                 minWidth: 0, maxWidth: .infinity, minHeight: 0,
                 maxHeight: .infinity, alignment: .topLeading
             )
+            .onChange(of: profileIndex) { _, newValue in
+                activeProfile = profiles[safe: profileIndex]
+            }
             .onChange(of: nfcScanner.scannedNFCTag) { _, newValue in
                 if let nfcResults = newValue {
                     toggleBlocking(results: nfcResults)
@@ -197,13 +192,20 @@ struct HomeView: View {
     }
 
     private func startBlocking(tag: String) {
-        print("Starting app blocks...")
-
-        appBlocker.activateRestrictions(selection: activitySelection)
-        activeSession =
-            BlockedSession
-            .createSession(in: context, withTag: tag)
-        startTimer()
+        if let definedProfile = activeProfile {
+            appBlocker
+                .activateRestrictions(
+                    selection: definedProfile.selectedActivity
+                )
+            activeSession =
+                BlockedProfileSession
+                .createSession(
+                    in: context,
+                    withTag: tag,
+                    withProfile: definedProfile
+                )
+            startTimer()
+        }
     }
 
     private func stopBlocking(tag: String) {
@@ -229,12 +231,14 @@ struct HomeView: View {
     }
 
     private func loadApp() {
-        activitySelection =
-            BlockedActivitySelection
-            .shared(in: context).selectedActivity
-        activeSession = BlockedSession.mostRecentActiveSession(in: context)
+        // TODO: set as the default profile here
+        activeProfile = profiles[safe: profileIndex]
+        
+        activeSession =
+            BlockedProfileSession
+            .mostRecentActiveSession(in: context)
         recentCompletedSessions =
-            BlockedSession
+            BlockedProfileSession
             .recentInactiveSessions(in: context)
 
         if activeSession?.isActive == true {
@@ -249,14 +253,8 @@ struct HomeView: View {
     private func reloadApp() {
         resetTimer()
         recentCompletedSessions =
-            BlockedSession
+            BlockedProfileSession
             .recentInactiveSessions(in: context)
-    }
-
-    private func updateBlockedActivitySelection(
-        newValue: FamilyActivitySelection
-    ) {
-        BlockedActivitySelection.updateSelection(in: context, with: newValue)
     }
 
     private func startTimer() {
