@@ -64,7 +64,7 @@ struct HomeView: View {
 
             if let mostRecent = activeProfile {
                 VStack(alignment: .leading, spacing: 10) {
-                    Text("Active profile")
+                    Text("Active Profile")
                         .font(.headline)
                         .fontWeight(.regular)
                         .foregroundColor(.secondary)
