@@ -13,7 +13,8 @@ struct HomeView: View {
     @EnvironmentObject var nfcScanner: NFCScanner
 
     // Profile management
-    @Query(sort: \BlockedProfiles.updatedAt, order: .reverse) private var profiles: [BlockedProfiles]
+    @Query(sort: \BlockedProfiles.updatedAt, order: .reverse) private
+        var profiles: [BlockedProfiles]
     @State private var profileIndex = 0
     @State private var isProfileListPresent = false
 
@@ -41,13 +42,25 @@ struct HomeView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
+            VStack(alignment: .leading, spacing: 10) {
+                Text("Time in Focus")
+                    .font(.headline)
+                    .fontWeight(.regular)
+                    .foregroundColor(.secondary)
+
+                Text(timeString(from: elapsedTime))
+                    .font(.system(size: 80))
+                    .fontWeight(.semibold)
+                    .foregroundColor(.primary)
+            }
+
             if let mostRecent = profiles[safe: profileIndex] {
-                VStack(alignment: .leading, spacing: 5) {
+                VStack(alignment: .leading, spacing: 10) {
                     Text("Active profile")
                         .font(.headline)
                         .fontWeight(.regular)
                         .foregroundColor(.secondary)
-                    
+
                     BlockedProfileSelector(
                         profile: mostRecent,
                         onSwipeLeft: {
@@ -60,52 +73,45 @@ struct HomeView: View {
                 }
             }
 
-            VStack(alignment: .leading, spacing: 5) {
-                Text("Time in Focus")
+            VStack(alignment: .leading, spacing: 10) {
+                Text("Manage")
                     .font(.headline)
                     .fontWeight(.regular)
                     .foregroundColor(.secondary)
 
-                Text(timeString(from: elapsedTime))
-                    .font(.system(size: 80))
-                    .fontWeight(.semibold)
-                    .foregroundColor(.primary)
-            }
-
-            Grid(horizontalSpacing: 10, verticalSpacing: 16) {
-                GridRow {
-                    ActionCard(
-                        icon: "person.crop.circle.fill",
-                        count: nil,
-                        label: "Profiles",
-                        color: .purple
-                    ) {
-                        isProfileListPresent = true
+                Grid(horizontalSpacing: 10, verticalSpacing: 16) {
+                    GridRow {
+                        ActionCard(
+                            icon: "person.crop.circle.fill",
+                            count: nil,
+                            label: "Profiles",
+                            color: .purple
+                        ) {
+                            isProfileListPresent = true
+                        }
+                        ActionCard(
+                            icon: "cart.fill",
+                            count: nil,
+                            label: "Purchase NFC tags",
+                            color: .gray
+                        ) {
+                            if let url = URL(string: AMZN_STORE_LINK) {
+                                openURL(url)
+                            }
+                        }
                     }
-                    ActionCard(
-                        icon: "cart.fill",
-                        count: nil,
-                        label: "Purchase NFC tags",
-                        color: .gray
-                    ) {
-                        if let url = URL(string: AMZN_STORE_LINK) {
-                            openURL(url)
+                    GridRow {
+                        ActionCard(
+                            icon: "heart.fill",
+                            count: nil,
+                            label: "Support us",
+                            color: .green
+                        ) {
+                            donationManager.tip()
                         }
                     }
                 }
-                GridRow {
-                    ActionCard(
-                        icon: "heart.fill",
-                        count: nil,
-                        label: "Support us",
-                        color: .green
-                    ) {
-                        donationManager.tip()
-                    }
-                }
             }
-
-            InactiveBlockedSessionView(sessions: recentCompletedSessions ?? [])
 
             ActionButton(
                 title: isBlocking
@@ -114,7 +120,8 @@ struct HomeView: View {
             ) {
                 scanButtonPress()
             }
-        }.padding(.horizontal, 20)
+        }.padding(.top, 10)
+            .padding(.horizontal, 20)
             .sheet(isPresented: $isProfileListPresent) {
                 BlockedProfileListView()
             }
@@ -125,7 +132,10 @@ struct HomeView: View {
             .onChange(of: activitySelection) { _, newSelection in
                 updateBlockedActivitySelection(newValue: activitySelection)
             }
-            .frame(maxWidth: .infinity, alignment: .leading)
+            .frame(
+                minWidth: 0, maxWidth: .infinity, minHeight: 0,
+                maxHeight: .infinity, alignment: .topLeading
+            )
             .onChange(of: nfcScanner.scannedNFCTag) { _, newValue in
                 if let nfcResults = newValue {
                     toggleBlocking(results: nfcResults)
@@ -154,16 +164,16 @@ struct HomeView: View {
                 Text(alertMessage)
             }
     }
-    
+
     private func incrementProfiles() {
         guard !profiles.isEmpty else { return }
-        
+
         profileIndex = (profileIndex + 1) % profiles.count
     }
 
     private func decrementProfiles() {
         guard !profiles.isEmpty else { return }
-        
+
         profileIndex = (profileIndex - 1 + profiles.count) % profiles.count
     }
 
