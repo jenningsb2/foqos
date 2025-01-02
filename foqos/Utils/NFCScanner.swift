@@ -3,7 +3,7 @@ import CoreNFC
 
 struct NFCResult: Equatable {
     var id: String
-    let data: Data
+    var url: String?
     var DateScanned: Date
 }
 
@@ -72,6 +72,7 @@ extension NFCScanner: NFCTagReaderSessionDelegate {
     
     func tagReaderSession(_ session: NFCTagReaderSession, didDetect tags: [NFCTag]) {
         guard let tag = tags.first else { return }
+
         
         session.connect(to: tag) { error in
             if let error = error {
@@ -90,50 +91,64 @@ extension NFCScanner: NFCTagReaderSessionDelegate {
         }
     }
     
-    private func readMiFareTag(_ tag: NFCMiFareTag, session: NFCTagReaderSession) {
-        let id = tag.identifier.hexEncodedString()
-        var tagData = Data()
+    private func updateWithNDEFMessageURL(_ message: NFCNDEFMessage) -> String? {
+        // UI elements are updated based on the received NDEF message.
+        let urls: [URLComponents] = message.records.compactMap { (payload: NFCNDEFPayload) -> URLComponents? in
+            // Search for URL record with matching domain host and scheme.
+            if let url = payload.wellKnownTypeURIPayload() {
+                let components = URLComponents(url: url, resolvingAgainstBaseURL: false)
+                if components?.host == "foqos.app" && components?.scheme == "https" {
+                    return components
+                }
+            }
+            return nil
+        }
         
-        // Read 12 pages starting from page 4
-        func readPage(_ index: Int) {
-            guard index < 16 else {
-                handleTagData(id: id, data: tagData, session: session)
+        // Valid tag should only contain 1 URL and contain multiple query items.
+        guard urls.count == 1,
+            let item = urls.first?.string else {
+            return nil
+        }
+        
+        return item
+    }
+    
+    private func readMiFareTag(_ tag: NFCMiFareTag, session: NFCTagReaderSession) {
+        tag.readNDEF() { (message: NFCNDEFMessage?, error: Error?) in
+            if error != nil || message == nil {
+                session.invalidate(errorMessage: "Read error. Please try again.")
                 return
             }
             
-            let command = Data([0x30, UInt8(index)])
-            tag.sendMiFareCommand(commandPacket: command) { result in
-                switch result {
-                case .success(let data):
-                    tagData.append(data)
-                    readPage(index + 1)
-                case .failure:
-                    self.handleTagData(id: id, data: tagData, session: session)
-                }
-            }
+            let url = self.updateWithNDEFMessageURL(message!)
+            self.handleTagData(
+                id: tag.identifier.hexEncodedString(),
+                url: url,
+                session: session
+            )
         }
-        
-        readPage(4)
     }
     
     private func readISO15693Tag(_ tag: NFCISO15693Tag, session: NFCTagReaderSession) {
-        let id = tag.identifier.hexEncodedString()
-        
-        tag.readMultipleBlocks(requestFlags: [.address, .highDataRate], blockRange: NSRange(location: 0, length: 4)) { result in
-            switch result {
-            case .success(let blocks):
-                let data = blocks.reduce(Data(), { $0 + $1 })
-                self.handleTagData(id: id, data: data, session: session)
-            case .failure:
-                self.handleTagData(id: id, data: Data(), session: session)
+        tag.readNDEF() { (message: NFCNDEFMessage?, error: Error?) in
+            if error != nil || message == nil {
+                session.invalidate(errorMessage: "Read error. Please try again.")
+                return
             }
+            
+            let url = self.updateWithNDEFMessageURL(message!)
+            self.handleTagData(
+                id: tag.identifier.hexEncodedString(),
+                url: url,
+                session: session
+            )
         }
     }
     
-    private func handleTagData(id: String, data: Data, session: NFCTagReaderSession) {        
+    private func handleTagData(id: String, url: String?, session: NFCTagReaderSession) {
         let result = NFCResult(
             id: id,
-            data: data,
+            url: url,
             DateScanned: Date()
         )
         
