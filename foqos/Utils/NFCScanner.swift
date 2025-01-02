@@ -12,12 +12,16 @@ class NFCScanner: NSObject, ObservableObject {
     @Published var errorMessage: String?
     
     private var nfcSession: NFCReaderSession?
+    private var urlToWrite: String?
+    private var isWriteMode: Bool = false
     
     func scan() {
         guard NFCReaderSession.readingAvailable else {
             self.errorMessage = "NFC scanning not available on this device"
             return
         }
+        
+        isWriteMode = false
         nfcSession = NFCTagReaderSession(
             pollingOption: [.iso14443, .iso15693],
             delegate: self,
@@ -28,8 +32,31 @@ class NFCScanner: NSObject, ObservableObject {
         
         isScanning = true
     }
+    
+    func writeURL(_ url: String) {
+        guard NFCReaderSession.readingAvailable else {
+            self.errorMessage = "NFC writing not available on this device"
+            return
+        }
+        
+        guard URL(string: url) != nil else {
+            self.errorMessage = "Invalid URL format"
+            return
+        }
+        
+        isWriteMode = true
+        urlToWrite = url
+        
+        // Using NFCNDEFReaderSession for writing
+        let ndefSession = NFCNDEFReaderSession(delegate: self, queue: nil, invalidateAfterFirstRead: false)
+        ndefSession.alertMessage = "Hold your iPhone near an NFC tag to write the URL."
+        ndefSession.begin()
+        
+        isScanning = true
+    }
 }
 
+// Existing NFCTagReaderSessionDelegate
 extension NFCScanner: NFCTagReaderSessionDelegate {
     func tagReaderSessionDidBecomeActive(_ session: NFCTagReaderSession) {
         // This method is called when the session begins.
@@ -83,6 +110,7 @@ extension NFCScanner: NFCTagReaderSessionDelegate {
         }
     }
     
+    // Existing handler methods remain unchanged...
     private func handleISO7816Tag(
         _ tag: NFCISO7816Tag,
         session: NFCTagReaderSession
@@ -153,6 +181,80 @@ extension NFCScanner: NFCTagReaderSessionDelegate {
             self.scannedNFCTag = result
             self.isScanning = false
             session.invalidate()
+        }
+    }
+}
+
+// New NDEF Writing Support
+extension NFCScanner: NFCNDEFReaderSessionDelegate {
+    func readerSession(_ session: NFCNDEFReaderSession, didDetectNDEFs messages: [NFCNDEFMessage]) {
+        // Not used for writing
+    }
+    
+    func readerSession(_ session: NFCNDEFReaderSession, didDetect tags: [NFCNDEFTag]) {
+        guard let tag = tags.first else {
+            session.invalidate(errorMessage: "No tag found")
+            return
+        }
+        
+        session.connect(to: tag) { error in
+            if let error = error {
+                session.invalidate(errorMessage: "Connection error: \(error.localizedDescription)")
+                return
+            }
+            
+            tag.queryNDEFStatus { status, capacity, error in
+                guard error == nil else {
+                    session.invalidate(errorMessage: "Failed to query tag")
+                    return
+                }
+                
+                switch status {
+                case .notSupported:
+                    session.invalidate(errorMessage: "Tag is not NDEF compliant")
+                case .readOnly:
+                    session.invalidate(errorMessage: "Tag is read-only")
+                case .readWrite:
+                    guard let urlString = self.urlToWrite,
+                          let url = URL(string: urlString),
+                          let urlPayload = NFCNDEFPayload.wellKnownTypeURIPayload(url: url) else {
+                        session.invalidate(errorMessage: "Invalid URL")
+                        return
+                    }
+                    
+                    let message = NFCNDEFMessage(records: [urlPayload])
+                    tag.writeNDEF(message) { error in
+                        if let error = error {
+                            session.invalidate(errorMessage: "Write failed: \(error.localizedDescription)")
+                        } else {
+                            session.alertMessage = "Successfully wrote URL to tag"
+                            session.invalidate()
+                        }
+                    }
+                @unknown default:
+                    session.invalidate(errorMessage: "Unknown tag status")
+                }
+            }
+        }
+    }
+    
+    func readerSessionDidBecomeActive(_ session: NFCNDEFReaderSession) {
+        // Session became active
+    }
+    
+    func readerSession(_ session: NFCNDEFReaderSession, didInvalidateWithError error: Error) {
+        DispatchQueue.main.async {
+            self.isScanning = false
+            if let readerError = error as? NFCReaderError {
+                switch readerError.code {
+                case .readerSessionInvalidationErrorFirstNDEFTagRead,
+                     .readerSessionInvalidationErrorUserCanceled:
+                    // User canceled or first tag read
+                    break
+                default:
+                    self.errorMessage = error.localizedDescription
+                }
+            }
         }
     }
 }

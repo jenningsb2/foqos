@@ -1,35 +1,40 @@
-import SwiftUI
 import FamilyControls
 import SwiftData
+import SwiftUI
 
 struct BlockedProfileView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
     
+    @EnvironmentObject var nfcScanner: NFCScanner
+
     // If profile is nil, we're creating a new profile
     var profile: BlockedProfiles?
-    
+
     @State private var name: String = ""
     @State private var selectedActivity = FamilyActivitySelection()
     @State private var catAndAppCount: Int = 0
     @State private var showingActivityPicker = false
     @State private var errorMessage: String?
     @State private var showError = false
-    
+
     private var isEditing: Bool {
         profile != nil
     }
-    
+
     init(profile: BlockedProfiles? = nil) {
         self.profile = profile
         _name = State(initialValue: profile?.name ?? "")
-        _selectedActivity = State(initialValue: profile?.selectedActivity ?? FamilyActivitySelection())
+        _selectedActivity = State(
+            initialValue: profile?.selectedActivity ?? FamilyActivitySelection()
+        )
         _catAndAppCount = State(
-            initialValue: BlockedProfiles
+            initialValue:
+                BlockedProfiles
                 .countSelectedActivities(selectedActivity)
         )
     }
-    
+
     var body: some View {
         NavigationStack {
             Form {
@@ -37,7 +42,7 @@ struct BlockedProfileView: View {
                     TextField("Profile Name", text: $name)
                         .textInputAutocapitalization(.words)
                 }
-                
+
                 Section("Selected Restrictions") {
                     Button(action: {
                         showingActivityPicker = true
@@ -59,9 +64,25 @@ struct BlockedProfileView: View {
                             .padding(.top, 4)
                     }
                 }
+                
+                if isEditing || !name.isEmpty {
+                    Section("Utilities") {
+                        Button(action: {
+                            writeProfile()
+                        }) {
+                            HStack {
+                                Image(systemName: "pencil.circle.fill")
+                                    .foregroundStyle(.green)
+                                Text("Write Profile to NFC Tag")
+                                Spacer()
+                            }
+                        }
+                    }
+                }
             }
             .onChange(of: selectedActivity) { _, newValue in
-                catAndAppCount = BlockedProfiles
+                catAndAppCount =
+                    BlockedProfiles
                     .countSelectedActivities(newValue)
             }
             .navigationTitle(isEditing ? "Profile Details" : "New Profile")
@@ -72,7 +93,7 @@ struct BlockedProfileView: View {
                         dismiss()
                     }
                 }
-                
+
                 ToolbarItem(placement: .topBarTrailing) {
                     Button(isEditing ? "Update" : "Create") {
                         saveProfile()
@@ -85,13 +106,20 @@ struct BlockedProfileView: View {
                 selection: $selectedActivity
             )
             .alert("Error", isPresented: $showError) {
-                Button("OK") { }
+                Button("OK") {}
             } message: {
                 Text(errorMessage ?? "An unknown error occurred")
             }
         }
     }
     
+    private func writeProfile() {
+        if let profileToWrite = profile {
+            let url = BlockedProfiles.getProfileDeepLink(profileToWrite)
+            nfcScanner.writeURL(url)
+        }
+    }
+
     private func saveProfile() {
         do {
             if let existingProfile = profile {
