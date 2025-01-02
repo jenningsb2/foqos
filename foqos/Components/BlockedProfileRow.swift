@@ -1,15 +1,41 @@
 import SwiftUI
 import FamilyControls
-
 struct ProfileRow: View {
     let profile: BlockedProfiles
     
+    var formattedUpdateTime: String {
+        let formatter = RelativeDateTimeFormatter()
+        formatter.unitsStyle = .short
+        return formatter.localizedString(for: profile.updatedAt, relativeTo: Date())
+    }
+    
+    var selectedItemsCount: Int {
+        BlockedProfiles.countSelectedActivities(profile.selectedActivity)
+    }
+    
     var body: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            Text(profile.name)
-                .font(.headline)
+        HStack {
+            VStack(alignment: .leading, spacing: 12) {
+                Text(profile.name)
+                    .font(.headline)
+                
+                HStack(spacing: 4) {
+                    Image(systemName: "clock")
+                    Text("Updated \(formattedUpdateTime)")
+                }
+                .foregroundStyle(.secondary)
+                .font(.caption)
+            }
+            
+            Spacer()
+            
+            HStack(spacing: 4) {
+                Image(systemName: "list.bullet.circle.fill")
+                Text("\(selectedItemsCount) items")
+            }
+            .foregroundStyle(.secondary)
+            .font(.subheadline)
         }
-        .padding(.vertical, 4)
     }
 }
 
@@ -18,7 +44,7 @@ struct ProfileRow: View {
         name: "⌛ School Hours",
         selectedActivity: FamilyActivitySelection(),
         createdAt: Date(),
-        updatedAt: Date().addingTimeInterval(-3600) // 1 hour ago
+        updatedAt: Date().addingTimeInterval(-3600)
     )
     
     return ProfileRow(profile: previewProfile)

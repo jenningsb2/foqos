@@ -29,6 +29,7 @@ struct BlockedProfileListView: View {
                         }
                         .onDelete(perform: deleteProfiles)
                     }
+                    .padding(.top, 10)
                 }
             }
             .navigationTitle("Profiles")
