@@ -40,118 +40,122 @@ struct HomeView: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 20) {
-            VStack(alignment: .leading, spacing: 10) {
-                SectionTitle("Time in Focus")
-                
-                Text(timeString(from: elapsedTime))
-                    .font(.system(size: 80))
-                    .fontWeight(.semibold)
-                    .foregroundColor(.primary)
-            }
-            
-            VStack(alignment: .leading, spacing: 10) {
-                SectionTitle("Weekly Usage")
-                
-                BlockedSessionsChart(sessions: recentCompletedSessions ?? [])
-            }
-
-            if let mostRecent = activeProfile {
+        ScrollView(showsIndicators: false) {
+            VStack(alignment: .leading, spacing: 20) {
                 VStack(alignment: .leading, spacing: 10) {
-                    SectionTitle("Active Profile")
+                    SectionTitle("Time in Focus")
 
-                    BlockedProfileSelector(
-                        profile: mostRecent,
-                        onSwipeLeft: {
-                            incrementProfiles()
-                        },
-                        onSwipeRight: {
-                            decrementProfiles()
-                        }
-                    )
+                    Text(timeString(from: elapsedTime))
+                        .font(.system(size: 80))
+                        .fontWeight(.semibold)
+                        .foregroundColor(.primary)
                 }
-            }
 
-            VStack(alignment: .leading, spacing: 10) {
-                SectionTitle("Manage")
+                VStack(alignment: .leading, spacing: 10) {
+                    SectionTitle("Weekly Usage")
 
-                Grid(horizontalSpacing: 10, verticalSpacing: 16) {
-                    GridRow {
-                        ActionCard(
-                            icon: "person.crop.circle.fill",
-                            count: nil,
-                            label: "Profiles",
-                            color: .purple
-                        ) {
-                            isProfileListPresent = true
+                    BlockedSessionsChart(
+                        sessions: recentCompletedSessions ?? [])
+                }
+
+                if let mostRecent = activeProfile {
+                    VStack(alignment: .leading, spacing: 10) {
+                        SectionTitle("Active Profile")
+
+                        BlockedProfileSelector(
+                            profile: mostRecent,
+                            onSwipeLeft: {
+                                incrementProfiles()
+                            },
+                            onSwipeRight: {
+                                decrementProfiles()
+                            }
+                        )
+                    }
+                }
+
+                VStack(alignment: .leading, spacing: 10) {
+                    SectionTitle("Manage")
+
+                    Grid(horizontalSpacing: 10, verticalSpacing: 16) {
+                        GridRow {
+                            ActionCard(
+                                icon: "person.crop.circle.fill",
+                                count: nil,
+                                label: "Profiles",
+                                color: .purple
+                            ) {
+                                isProfileListPresent = true
+                            }
+                            ActionCard(
+                                icon: "cart.fill",
+                                count: nil,
+                                label: "Purchase NFC tags",
+                                color: .gray
+                            ) {
+                                if let url = URL(string: AMZN_STORE_LINK) {
+                                    openURL(url)
+                                }
+                            }
                         }
-                        ActionCard(
-                            icon: "cart.fill",
-                            count: nil,
-                            label: "Purchase NFC tags",
-                            color: .gray
-                        ) {
-                            if let url = URL(string: AMZN_STORE_LINK) {
-                                openURL(url)
+                        GridRow {
+                            ActionCard(
+                                icon: "heart.fill",
+                                count: nil,
+                                label: "Support us",
+                                color: .green
+                            ) {
+                                donationManager.tip()
                             }
                         }
                     }
-                    GridRow {
-                        ActionCard(
-                            icon: "heart.fill",
-                            count: nil,
-                            label: "Support us",
-                            color: .green
-                        ) {
-                            donationManager.tip()
-                        }
-                    }
                 }
-            }
 
-            Spacer()
-            
-            VersionFooter()
-                .frame(maxWidth: .infinity)
-        }.padding(.top, 10)
-            .padding(.horizontal, 20)
-            .sheet(isPresented: $isProfileListPresent) {
-                BlockedProfileListView()
+                Spacer()
+
+                VersionFooter()
+                    .frame(maxWidth: .infinity)
             }
-            .frame(
-                minWidth: 0, maxWidth: .infinity, minHeight: 0,
-                maxHeight: .infinity, alignment: .topLeading
-            )
-            .onChange(of: profileIndex) { _, newValue in
-                activeProfile = profiles[safe: profileIndex]
+        }
+        .padding(.top, 10)
+        .padding(.horizontal, 20)
+        .sheet(isPresented: $isProfileListPresent) {
+            BlockedProfileListView()
+        }
+        .frame(
+            minWidth: 0, maxWidth: .infinity, minHeight: 0,
+            maxHeight: .infinity, alignment: .topLeading
+        )
+        .onChange(of: profileIndex) { _, newValue in
+            activeProfile = profiles[safe: profileIndex]
+        }
+        .onChange(of: nfcScanner.scannedNFCTag) { _, newValue in
+            if let nfcResults = newValue {
+                toggleBlocking(results: nfcResults)
             }
-            .onChange(of: nfcScanner.scannedNFCTag) { _, newValue in
-                if let nfcResults = newValue {
-                    toggleBlocking(results: nfcResults)
-                }
+        }
+        .onChange(of: appBlocker.isAuthorized) { _, newValue in
+            if newValue {
+                showIntroScreen = false
+            } else {
+                showIntroScreen = true
             }
-            .onChange(of: appBlocker.isAuthorized) { _, newValue in
-                if newValue {
-                    showIntroScreen = false
-                } else {
-                    showIntroScreen = true
-                }
-            }
-            .onAppear {
-                loadApp()
-            }
-            .onDisappear {
-                unloadApp()
-            }.sheet(isPresented: $showIntroScreen) {
-                IntroView {
-                    appBlocker.requestAuthorization()
-                }.interactiveDismissDisabled()
-            }
-            .alert(alertTitle, isPresented: $showingAlert) {
-                Button("OK", role: .cancel) { dismissAlert() }
-            } message: {
-                Text(alertMessage)
-            }
+        }
+        .onAppear {
+            loadApp()
+        }
+        .onDisappear {
+            unloadApp()
+        }.sheet(isPresented: $showIntroScreen) {
+            IntroView {
+                appBlocker.requestAuthorization()
+            }.interactiveDismissDisabled()
+        }
+        .alert(alertTitle, isPresented: $showingAlert) {
+            Button("OK", role: .cancel) { dismissAlert() }
+        } message: {
+            Text(alertMessage)
+        }
     }
 
     private func incrementProfiles() {
@@ -227,7 +231,7 @@ struct HomeView: View {
     private func loadApp() {
         // TODO: set as the default profile here
         activeProfile = profiles[safe: profileIndex]
-        
+
         activeSession =
             BlockedProfileSession
             .mostRecentActiveSession(in: context)
