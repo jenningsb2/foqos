@@ -11,6 +11,7 @@ struct HomeView: View {
     @EnvironmentObject var appBlocker: AppBlocker
     @EnvironmentObject var donationManager: TipManager
     @EnvironmentObject var nfcScanner: NFCScanner
+    @EnvironmentObject var navigationManager: NavigationManager
 
     // Profile management
     @Query(sort: \BlockedProfiles.updatedAt, order: .reverse) private
@@ -162,6 +163,11 @@ struct HomeView: View {
         .onChange(of: profileIndex) { _, newValue in
             activeProfile = profiles[safe: profileIndex]
         }
+        .onChange(of: navigationManager.profileId) { _, newValue in
+            if let profileId = newValue {
+                toggleSessionFromDeeplink(profileId)
+            }
+        }
         .onChange(of: nfcScanner.scannedNFCTag) { _, newValue in
             if let nfcResults = newValue {
                 toggleBlocking(results: nfcResults)
@@ -190,6 +196,31 @@ struct HomeView: View {
             Button("OK", role: .cancel) { dismissAlert() }
         } message: {
             Text(alertMessage)
+        }
+    }
+    
+    private func toggleSessionFromDeeplink(_ profileId: String) {
+        guard let profileUUID = UUID(uuidString: profileId) else {
+            showErrorAlert(message: "Failed to parse profile in tag")
+            return
+        }
+        
+        do {
+            guard let profile = try BlockedProfiles.findProfile(
+                byID: profileUUID,
+                in: context
+            ) else {
+                showErrorAlert(message: "Failed to find a profile stored locally that matches the tag")
+                return
+            }
+            
+            let url = BlockedProfiles.getProfileDeepLink(profile)
+            let nfcResults = nfcScanner.resultFromURL(url)
+            
+            toggleBlocking(results: nfcResults)
+            navigationManager.clearProfileId()
+        } catch {
+            showErrorAlert(message: "Something went wrong fetching profile")
         }
     }
 
