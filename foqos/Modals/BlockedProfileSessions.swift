@@ -6,7 +6,7 @@ class BlockedProfileSession {
     @Attribute(.unique) var id: String
     var tag: String
 
-    @Relationship(inverse: \BlockedProfiles.sessions) var blockedProfile:
+    @Relationship var blockedProfile:
         BlockedProfiles
 
     var startTime: Date
