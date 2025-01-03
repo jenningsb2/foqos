@@ -51,20 +51,34 @@ struct HomeView: View {
     var body: some View {
         ScrollView(showsIndicators: false) {
             VStack(alignment: .leading, spacing: 20) {
-                VStack(alignment: .leading, spacing: 10) {
-                    SectionTitle("Time in Focus")
 
-                    Text(timeString(from: elapsedTime))
-                        .font(.system(size: 80))
-                        .fontWeight(.semibold)
-                        .foregroundColor(.primary)
+                if profiles.isEmpty {
+                    Spacer()
+                        .frame(height: 60)
+                    Welcome(onTap: {
+                        showActiveProfileView = true
+                    })
+                    Spacer()
                 }
 
-                VStack(alignment: .leading, spacing: 10) {
-                    SectionTitle("Weekly Usage")
+                if !profiles.isEmpty {
+                    VStack(alignment: .leading, spacing: 10) {
+                        SectionTitle("Time in Focus")
 
-                    BlockedSessionsChart(
-                        sessions: recentCompletedSessions)
+                        Text(timeString(from: elapsedTime))
+                            .font(.system(size: 80))
+                            .fontWeight(.semibold)
+                            .foregroundColor(.primary)
+                    }
+                }
+
+                if !profiles.isEmpty {
+                    VStack(alignment: .leading, spacing: 10) {
+                        SectionTitle("Weekly Usage")
+
+                        BlockedSessionsChart(
+                            sessions: recentCompletedSessions)
+                    }
                 }
 
                 if let mostRecent = activeProfile {
@@ -73,7 +87,8 @@ struct HomeView: View {
 
                         BlockedProfileSelector(
                             profile: mostRecent,
-                            isActive: activeProfile?.id == activeSession?.blockedProfile.id,
+                            isActive: activeProfile?.id
+                                == activeSession?.blockedProfile.id,
                             onSwipeLeft: {
                                 incrementProfiles()
                             },
@@ -115,14 +130,16 @@ struct HomeView: View {
                             }
                         }
                         GridRow {
-                            ActionCard(
-                                icon: "wave.3.right.circle.fill",
-                                count: nil,
-                                label: isBlocking
-                                    ? "Stop session" : "Start session",
-                                color: isBlocking ? .red : .green
-                            ) {
-                                scanButtonPress()
+                            if !profiles.isEmpty {
+                                ActionCard(
+                                    icon: "wave.3.right.circle.fill",
+                                    count: nil,
+                                    label: isBlocking
+                                        ? "Stop session" : "Start session",
+                                    color: isBlocking ? .red : .green
+                                ) {
+                                    scanButtonPress()
+                                }
                             }
                             ActionCard(
                                 icon: "heart.fill",
@@ -198,25 +215,30 @@ struct HomeView: View {
             Text(alertMessage)
         }
     }
-    
+
     private func toggleSessionFromDeeplink(_ profileId: String) {
         guard let profileUUID = UUID(uuidString: profileId) else {
             showErrorAlert(message: "Failed to parse profile in tag")
             return
         }
-        
+
         do {
-            guard let profile = try BlockedProfiles.findProfile(
-                byID: profileUUID,
-                in: context
-            ) else {
-                showErrorAlert(message: "Failed to find a profile stored locally that matches the tag")
+            guard
+                let profile = try BlockedProfiles.findProfile(
+                    byID: profileUUID,
+                    in: context
+                )
+            else {
+                showErrorAlert(
+                    message:
+                        "Failed to find a profile stored locally that matches the tag"
+                )
                 return
             }
-            
+
             let url = BlockedProfiles.getProfileDeepLink(profile)
             let nfcResults = nfcScanner.resultFromURL(url)
-            
+
             toggleBlocking(results: nfcResults)
             navigationManager.clearProfileId()
         } catch {
@@ -291,7 +313,7 @@ struct HomeView: View {
 
         appBlocker.deactivateRestrictions()
         session.endSession()
-        
+
         activeSession = nil
         stopTimer()
     }
@@ -362,6 +384,7 @@ struct HomeView: View {
         .environmentObject(AppBlocker())
         .environmentObject(TipManager())
         .environmentObject(NFCScanner())
+        .environmentObject(NavigationManager())
         .defaultAppStorage(UserDefaults(suiteName: "preview")!)
         .onAppear {
             UserDefaults(suiteName: "preview")!.set(
