@@ -28,7 +28,7 @@ struct HomeView: View {
         sort: \BlockedProfileSession.endTime,
         order: .reverse
     ) private var recentCompletedSessions: [BlockedProfileSession]
-    
+
     @State var activeSession: BlockedProfileSession?
 
     // Timers
@@ -72,6 +72,7 @@ struct HomeView: View {
 
                         BlockedProfileSelector(
                             profile: mostRecent,
+                            isActive: activeProfile?.id == activeSession?.blockedProfile.id,
                             onSwipeLeft: {
                                 incrementProfiles()
                             },
@@ -114,10 +115,19 @@ struct HomeView: View {
                         }
                         GridRow {
                             ActionCard(
+                                icon: "wave.3.right.circle.fill",
+                                count: nil,
+                                label: isBlocking
+                                    ? "Stop session" : "Start session",
+                                color: isBlocking ? .red : .green
+                            ) {
+                                scanButtonPress()
+                            }
+                            ActionCard(
                                 icon: "heart.fill",
                                 count: nil,
                                 label: "Support us",
-                                color: .green
+                                color: .pink
                             ) {
                                 donationManager.tip()
                             }
@@ -249,7 +259,9 @@ struct HomeView: View {
         }
 
         appBlocker.deactivateRestrictions()
-        activeSession?.endSession()
+        session.endSession()
+        
+        activeSession = nil
         stopTimer()
     }
 

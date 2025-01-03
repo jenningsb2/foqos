@@ -2,6 +2,9 @@ import SwiftUI
 
 struct BlockedProfileSelector: View {
     let profile: BlockedProfiles
+    
+    var isActive: Bool?
+    
     var onSwipeLeft: () -> Void
     var onSwipeRight: () -> Void
     var onTap: () -> Void
@@ -19,7 +22,10 @@ struct BlockedProfileSelector: View {
     }
     
     private var backgroundColor: Color {
-        isLongPressing ? Color.green.opacity(0.3) : Color(.secondarySystemBackground)
+        if (isActive == true) {
+            return Color.green.opacity(0.6)
+        }
+        return isLongPressing ? Color.green.opacity(0.3) : Color(.secondarySystemBackground)
     }
     
     var body: some View {
