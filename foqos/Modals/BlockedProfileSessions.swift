@@ -69,3 +69,5 @@ class BlockedProfileSession {
         return (try? context.fetch(descriptor)) ?? []
     }
 }
+
+

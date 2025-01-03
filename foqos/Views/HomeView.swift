@@ -126,7 +126,16 @@ struct HomeView: View {
         }
         .padding(.top, 1)
         .padding(.horizontal, 20)
-        .sheet(isPresented: $isProfileListPresent) {
+        .sheet(
+            isPresented: $isProfileListPresent,
+            onDismiss: {
+                if profileIndex >= profiles.count {
+                    profileIndex = max(profiles.count - 1, 0)
+                }
+                
+                activeProfile = profiles[safe: profileIndex]
+            }
+        ) {
             BlockedProfileListView()
         }
         .frame(
@@ -238,7 +247,6 @@ struct HomeView: View {
     }
 
     private func loadApp() {
-        // TODO: set as the default profile here
         activeProfile = profiles[safe: profileIndex]
 
         activeSession =
