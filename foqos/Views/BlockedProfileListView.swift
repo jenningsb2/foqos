@@ -3,11 +3,12 @@ import SwiftData
 import SwiftUI
 
 struct BlockedProfileListView: View {
-    @Environment(\.modelContext) private var modelContext
+    @Environment(\.modelContext) private var context
 
     @Query private var profiles: [BlockedProfiles]
     @State private var showingCreateProfile = false
     @State private var profileToEdit: BlockedProfiles?
+    @State private var showErrorAlert = false
 
     var body: some View {
         NavigationStack {
@@ -51,13 +52,27 @@ struct BlockedProfileListView: View {
             .sheet(item: $profileToEdit) { profile in
                 BlockedProfileView(profile: profile)
             }
+            .alert("Cannot Delete Active Profile",
+                   isPresented: $showErrorAlert) {
+                Button("OK", role: .cancel) {}
+            } message: {
+                Text("You cannot delete a profile that is currently active. Please switch to a different profile first.")
+            }
         }
     }
 
     private func deleteProfiles(at offsets: IndexSet) {
+        let activeSession = BlockedProfileSession.mostRecentActiveSession(
+            in: context)
+
         for index in offsets {
             let profile = profiles[index]
-            try? BlockedProfiles.deleteProfile(profile, in: modelContext)
+            if profile.id == activeSession?.blockedProfile.id {
+                showErrorAlert = true
+                return
+            }
+            
+            try? BlockedProfiles.deleteProfile(profile, in: context)
         }
     }
 }

@@ -21,8 +21,15 @@ struct HomeView: View {
     @State private var showActiveProfileView = false
 
     // Activity sessions
+    @Query(sort: \BlockedProfileSession.startTime, order: .reverse) private
+        var sessions: [BlockedProfileSession]
+    @Query(
+        filter: #Predicate<BlockedProfileSession> { $0.endTime != nil },
+        sort: \BlockedProfileSession.endTime,
+        order: .reverse
+    ) private var recentCompletedSessions: [BlockedProfileSession]
+    
     @State var activeSession: BlockedProfileSession?
-    @State var recentCompletedSessions: [BlockedProfileSession]?
 
     // Timers
     @State private var elapsedTime: TimeInterval = 0
@@ -56,7 +63,7 @@ struct HomeView: View {
                     SectionTitle("Weekly Usage")
 
                     BlockedSessionsChart(
-                        sessions: recentCompletedSessions ?? [])
+                        sessions: recentCompletedSessions)
                 }
 
                 if let mostRecent = activeProfile {
@@ -132,7 +139,7 @@ struct HomeView: View {
                 if profileIndex >= profiles.count {
                     profileIndex = max(profiles.count - 1, 0)
                 }
-                
+
                 activeProfile = profiles[safe: profileIndex]
             }
         ) {
@@ -252,9 +259,6 @@ struct HomeView: View {
         activeSession =
             BlockedProfileSession
             .mostRecentActiveSession(in: context)
-        recentCompletedSessions =
-            BlockedProfileSession
-            .recentInactiveSessions(in: context)
 
         if activeSession?.isActive == true {
             startTimer()
@@ -267,9 +271,6 @@ struct HomeView: View {
 
     private func reloadApp() {
         resetTimer()
-        recentCompletedSessions =
-            BlockedProfileSession
-            .recentInactiveSessions(in: context)
     }
 
     private func startTimer() {
