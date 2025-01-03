@@ -21,6 +21,13 @@ struct foqosApp: App {
                 .onOpenURL() { url in
                     handleUniversalLink(url)
                 }
+                .onContinueUserActivity(NSUserActivityTypeBrowsingWeb) { userActivity in
+                        guard let url = userActivity.webpageURL else {
+                                return
+                        }
+                    handleUniversalLink(url)
+                    
+                }
                 .environmentObject(appBlocker)
                 .environmentObject(donationManager)
                 .environmentObject(nfcScanner)

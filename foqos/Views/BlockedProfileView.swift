@@ -79,6 +79,19 @@ struct BlockedProfileView: View {
                         }
                     }
                 }
+                
+                if isEditing, let validProfile = profile {
+                    Section("Stats for Nerds") {
+                        HStack {
+                            Text("Profile ID")
+                                .foregroundStyle(.gray)
+                            Spacer()
+                            Text(validProfile.id.uuidString)
+                                .truncationMode(.tail)
+                                .foregroundStyle(.gray)
+                        }
+                    }
+                }
             }
             .onChange(of: selectedActivity) { _, newValue in
                 catAndAppCount =
