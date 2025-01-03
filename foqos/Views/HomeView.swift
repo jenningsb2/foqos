@@ -214,7 +214,7 @@ struct HomeView: View {
             "Toggling block for scanned tag \(results.id) on \(results.DateScanned)"
         )
 
-        let tag = results.id
+        let tag = results.url ?? results.id
         if isBlocking {
             stopBlocking(tag: tag)
         } else {
