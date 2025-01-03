@@ -13,6 +13,7 @@ struct foqosApp: App {
     @StateObject private var appBlocker = AppBlocker()
     @StateObject private var donationManager = TipManager()
     @StateObject private var nfcScanner = NFCScanner()
+    @StateObject private var navigationManager = NavigationManager()
 
     var body: some Scene {
         WindowGroup {
@@ -23,6 +24,7 @@ struct foqosApp: App {
                 .environmentObject(appBlocker)
                 .environmentObject(donationManager)
                 .environmentObject(nfcScanner)
+                .environmentObject(navigationManager)
         }
         .modelContainer(
             for: [
@@ -34,24 +36,6 @@ struct foqosApp: App {
     
     
     private func handleUniversalLink(_ url: URL) {
-        print("Universal link received:", url.absoluteString) // Add this
-        
-        // Parse and handle the URL
-        let components = URLComponents(url: url, resolvingAgainstBaseURL: true)
-        guard let path = components?.path else { return }
-
-        // Use your app's navigation state to navigate
-        // Example using @StateObject:
-        print("Path:", path) // Add this
-        switch path {
-        case "/products":
-            // Navigate to products
-            break
-        case "/profile":
-            // Navigate to profile
-            break
-        default:
-            break
-        }
+        navigationManager.handleLink(url)
     }
 }
