@@ -197,6 +197,11 @@ struct HomeView: View {
                 showIntroScreen = true
             }
         }
+        .onChange(of: profiles) { oldValue, newValue in
+            if !newValue.isEmpty {
+                loadApp()
+            }
+        }
         .onAppear {
             loadApp()
         }
