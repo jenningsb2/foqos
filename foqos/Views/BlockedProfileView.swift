@@ -40,7 +40,7 @@ struct BlockedProfileView: View {
             Form {
                 Section("Profile Details") {
                     TextField("Profile Name", text: $name)
-                        .textInputAutocapitalization(.words)
+                        .textContentType(.none)
                 }
 
                 Section("Selected Restrictions") {

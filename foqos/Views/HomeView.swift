@@ -46,6 +46,7 @@ struct HomeView: View {
 
     // UI States
     @State private var isRefreshing = false
+    @State private var opacityValue = 1.0
 
     var isBlocking: Bool {
         return activeSession?.isActive == true
@@ -81,7 +82,25 @@ struct HomeView: View {
                         Text(timeString(from: elapsedTime))
                             .font(.system(size: 80))
                             .fontWeight(.semibold)
-                            .foregroundColor(.primary)
+                            .foregroundColor(
+                                isBlocking ? Color(hex: "#32CD32") : .primary
+                            )
+                            .opacity(isBlocking ? opacityValue : 1)
+                            .animation(
+                                .easeInOut(duration: 1).repeatForever(),
+                                value: opacityValue
+                            )
+                            .onChange(of: isBlocking) { _, newValue in
+                                if newValue {
+                                    withAnimation(
+                                        .easeInOut(duration: 1).repeatForever()
+                                    ) {
+                                        opacityValue = 0.3
+                                    }
+                                } else {
+                                    opacityValue = 1
+                                }
+                            }
                     }
                 }
 
