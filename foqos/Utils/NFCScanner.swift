@@ -20,7 +20,7 @@ class NFCScanner: NSObject, ObservableObject {
         return NFCResult(id: url, url: url, DateScanned: Date())
     }
 
-    func scan() {
+    func scan(profileName: String) {
         guard NFCReaderSession.readingAvailable else {
             self.errorMessage = "NFC scanning not available on this device"
             return
@@ -33,7 +33,7 @@ class NFCScanner: NSObject, ObservableObject {
             queue: nil
         )
         nfcSession?.alertMessage =
-            "Hold your iPhone near an NFC tag to change focus."
+        "Hold your iPhone near an NFC tag to trigger " + profileName
         nfcSession?.begin()
 
         isScanning = true
@@ -57,7 +57,7 @@ class NFCScanner: NSObject, ObservableObject {
         let ndefSession = NFCNDEFReaderSession(
             delegate: self, queue: nil, invalidateAfterFirstRead: false)
         ndefSession.alertMessage =
-            "Hold your iPhone near an NFC tag to write the URL."
+            "Hold your iPhone near an NFC tag to write the profile."
         ndefSession.begin()
 
         isScanning = true

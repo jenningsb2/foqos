@@ -295,7 +295,7 @@ struct HomeView: View {
     }
 
     private func scanButtonPress() {
-        nfcScanner.scan()
+        nfcScanner.scan(profileName: activeProfile?.name ?? "Session")
     }
 
     private func toggleBlocking(results: NFCResult) {
