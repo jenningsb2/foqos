@@ -87,7 +87,7 @@ struct HomeView: View {
                             )
                             .opacity(isBlocking ? opacityValue : 1)
                             .animation(
-                                .easeInOut(duration: 1).repeatForever(),
+                                .easeInOut(duration: 0.7).repeatForever(),
                                 value: opacityValue
                             )
                             .onChange(of: isBlocking) { _, newValue in
