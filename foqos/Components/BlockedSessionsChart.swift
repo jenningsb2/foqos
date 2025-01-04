@@ -45,9 +45,9 @@ struct BlockedSessionsChart: View {
 
     private func getBarColor(for index: Int) -> Color {
         if let selectedIndex = selectedBarIndex, selectedIndex == index {
-            return .green.opacity(1)  // Selected bar
+            return .purple.opacity(1)  // Selected bar
         }
-        return .green.opacity(0.6)  // Unselected bars
+        return .purple.opacity(0.6)  // Unselected bars
     }
 
     var body: some View {

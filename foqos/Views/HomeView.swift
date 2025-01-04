@@ -43,6 +43,9 @@ struct HomeView: View {
 
     // Intro sheet
     @AppStorage("showIntroScreen") private var showIntroScreen = true
+    
+    // UI States
+    @State private var isRefreshing = false
 
     var isBlocking: Bool {
         return activeSession?.isActive == true
@@ -50,7 +53,12 @@ struct HomeView: View {
 
     var body: some View {
         ScrollView(showsIndicators: false) {
+            RefreshControl(isRefreshing: $isRefreshing) {
+                loadApp()
+            }
+            
             VStack(alignment: .leading, spacing: 20) {
+                
 
                 if profiles.isEmpty {
                     Spacer()
