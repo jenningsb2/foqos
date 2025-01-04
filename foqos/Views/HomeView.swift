@@ -43,7 +43,7 @@ struct HomeView: View {
 
     // Intro sheet
     @AppStorage("showIntroScreen") private var showIntroScreen = true
-    
+
     // UI States
     @State private var isRefreshing = false
 
@@ -56,9 +56,8 @@ struct HomeView: View {
             RefreshControl(isRefreshing: $isRefreshing) {
                 loadApp()
             }
-            
+
             VStack(alignment: .leading, spacing: 20) {
-                
 
                 if profiles.isEmpty {
                     Spacer()
@@ -71,7 +70,9 @@ struct HomeView: View {
 
                 if !profiles.isEmpty {
                     VStack(alignment: .leading, spacing: 10) {
-                        SectionTitle("Time in Focus")
+                        SectionTitle(
+                            isBlocking
+                                ? "Stop " : "Start " + activeProfile?.name)
 
                         Text(timeString(from: elapsedTime))
                             .font(.system(size: 80))
