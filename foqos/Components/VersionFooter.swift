@@ -13,7 +13,7 @@ struct VersionFooter: View {
                 .font(.footnote)
                 .foregroundColor(.secondary)
 
-            Text("Made with ❤️ Calgary, AB 🇨🇦")
+            Text("Made with ❤️ in Calgary, AB 🇨🇦")
                 .font(.footnote)
                 .foregroundColor(.secondary)
 

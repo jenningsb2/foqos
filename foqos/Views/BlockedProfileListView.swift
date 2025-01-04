@@ -17,7 +17,7 @@ struct BlockedProfileListView: View {
                     EmptyView(
                         iconName: "person.crop.circle.badge.plus",
                         headingText:
-                            "Group and switch between sessions effortlessly with customizable profiles"
+                            "Group and switch between sets of blocked restrictions with customizable profiles"
                     )
                 } else {
                     List {
@@ -40,7 +40,7 @@ struct BlockedProfileListView: View {
                     }) {
                         HStack {
                             Image(systemName: "plus.circle.fill")
-                            Text("Create profile")
+                            Text("New")
                                 .bold()
                         }
                     }
@@ -52,11 +52,15 @@ struct BlockedProfileListView: View {
             .sheet(item: $profileToEdit) { profile in
                 BlockedProfileView(profile: profile)
             }
-            .alert("Cannot Delete Active Profile",
-                   isPresented: $showErrorAlert) {
+            .alert(
+                "Cannot Delete Active Profile",
+                isPresented: $showErrorAlert
+            ) {
                 Button("OK", role: .cancel) {}
             } message: {
-                Text("You cannot delete a profile that is currently active. Please switch to a different profile first.")
+                Text(
+                    "You cannot delete a profile that is currently active. Please switch to a different profile first."
+                )
             }
         }
     }
@@ -71,7 +75,7 @@ struct BlockedProfileListView: View {
                 showErrorAlert = true
                 return
             }
-            
+
             try? BlockedProfiles.deleteProfile(profile, in: context)
         }
     }

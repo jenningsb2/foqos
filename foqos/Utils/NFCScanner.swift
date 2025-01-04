@@ -136,6 +136,19 @@ extension NFCScanner: NFCTagReaderSessionDelegate {
     ) {
         tag.readNDEF { (message: NFCNDEFMessage?, error: Error?) in
             if error != nil || message == nil {
+                if let nfcError = error as? NFCReaderError,
+                    nfcError.code
+                        == NFCReaderError
+                        .ndefReaderSessionErrorZeroLengthMessage
+                {
+                    self.handleTagData(
+                        id: tag.identifier.hexEncodedString(),
+                        url: nil,
+                        session: session
+                    )
+                    return
+                }
+
                 session.invalidate(
                     errorMessage: "Read error. Please try again.")
                 return
@@ -155,6 +168,19 @@ extension NFCScanner: NFCTagReaderSessionDelegate {
     ) {
         tag.readNDEF { (message: NFCNDEFMessage?, error: Error?) in
             if error != nil || message == nil {
+                if let nfcError = error as? NFCReaderError,
+                    nfcError.code
+                        == NFCReaderError
+                        .ndefReaderSessionErrorZeroLengthMessage
+                {
+                    self.handleTagData(
+                        id: tag.identifier.hexEncodedString(),
+                        url: nil,
+                        session: session
+                    )
+                    return
+                }
+
                 session.invalidate(
                     errorMessage: "Read error. Please try again.")
                 return
