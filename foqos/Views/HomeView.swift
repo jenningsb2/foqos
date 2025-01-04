@@ -51,6 +51,12 @@ struct HomeView: View {
         return activeSession?.isActive == true
     }
 
+    var sessionStatusStr: String {
+        let sessionName = activeProfile?.name ?? "Sesssion"
+        return isBlocking
+            ? "Stop " : "Start " + sessionName
+    }
+
     var body: some View {
         ScrollView(showsIndicators: false) {
             RefreshControl(isRefreshing: $isRefreshing) {
@@ -70,9 +76,7 @@ struct HomeView: View {
 
                 if !profiles.isEmpty {
                     VStack(alignment: .leading, spacing: 10) {
-                        SectionTitle(
-                            isBlocking
-                                ? "Stop " : "Start " + activeProfile?.name)
+                        SectionTitle(sessionStatusStr)
 
                         Text(timeString(from: elapsedTime))
                             .font(.system(size: 80))
@@ -143,8 +147,7 @@ struct HomeView: View {
                                 ActionCard(
                                     icon: "wave.3.right.circle.fill",
                                     count: nil,
-                                    label: isBlocking
-                                        ? "Stop session" : "Start session",
+                                    label: sessionStatusStr,
                                     color: isBlocking ? .red : .green
                                 ) {
                                     scanButtonPress()
